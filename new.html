@@ -144,13 +144,189 @@
             border-left: 3px solid #40e0d0;
         }
         
-        .mermaid-box {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            min-height: 400px;
-        }
+        .portal-ring-container {
+    text-align: center;
+    margin: 30px 0;
+    position: relative;
+    min-height: 500px;
+}
+
+.portal-ring {
+    width: 400px;
+    height: 400px;
+    margin: 0 auto;
+    position: relative;
+    border-radius: 50%;
+    border: 2px dashed rgba(76, 201, 240, 0.3);
+}
+
+.portal-dot {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+.portal-dot:hover {
+    transform: scale(1.2);
+    z-index: 10;
+}
+
+.portal-dot.day-portal {
+    background: rgba(255, 158, 0, 0.9);
+    border: 2px solid #ff9e00;
+    color: #000;
+}
+
+.portal-dot.night-portal {
+    background: rgba(114, 9, 183, 0.9);
+    border: 2px solid #7209b7;
+    color: white;
+}
+
+.portal-dot.current-portal {
+    background: rgba(76, 201, 240, 0.9);
+    border: 3px solid #4cc9f0;
+    box-shadow: 0 0 20px #4cc9f0;
+    z-index: 5;
+    color: white;
+}
+
+.portal-number {
+    font-size: 0.8rem;
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #a9d6e5;
+}
+
+.hebrew-char {
+    font-size: 1.5rem;
+    font-family: 'Times New Roman', serif;
+}
+
+.portal-info {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    max-width: 400px;
+    margin: 30px auto;
+    border: 1px solid rgba(76, 201, 240, 0.2);
+}
+
+.hebrew-letter {
+    font-size: 4rem;
+    color: #4cc9f0;
+    font-family: 'Times New Roman', serif;
+    margin-bottom: 10px;
+}
+
+.portal-name {
+    font-size: 1.5rem;
+    color: #ff9e00;
+    margin-bottom: 10px;
+}
+
+.portal-time {
+    font-size: 2rem;
+    color: #4cc9f0;
+    font-family: monospace;
+    margin-bottom: 10px;
+}
+
+.portal-desc {
+    color: #a9d6e5;
+    font-style: italic;
+}
+
+.portal-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.portal-controls button {
+    padding: 10px 20px;
+    background: rgba(76, 201, 240, 0.2);
+    border: 1px solid #4cc9f0;
+    color: #4cc9f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.portal-controls button:hover {
+    background: rgba(76, 201, 240, 0.4);
+    transform: translateY(-2px);
+}
+
+.timeline-legend {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.day-color {
+    background: #ff9e00;
+}
+
+.night-color {
+    background: #7209b7;
+}
+
+.current-color {
+    background: #4cc9f0;
+}
+
+.connection-line {
+    position: absolute;
+    height: 1px;
+    background: rgba(76, 201, 240, 0.2);
+    transform-origin: 0 0;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .portal-ring {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .portal-dot {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .timeline-legend {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+}
         
         footer {
             text-align: center;
@@ -212,41 +388,43 @@
             </div>
         </div>
         
-        <div class="panel">
-            <h2>📊 Overlap Timeline</h2>
-            <div class="mermaid-box">
-                <div class="mermaid" id="mermaid-diagram">
-                    %%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true, 'primaryColor': '#0f2027', 'primaryTextColor': '#f0f0f0', 'primaryBorderColor': '#40e0d0', 'lineColor': '#40e0d0', 'secondaryColor': '#203a43', 'tertiaryColor': '#2c5364' }}}%%
-                    timeline
-                        title Clock Hand Overlaps Timeline
-                        section Night (12AM-6AM)
-                            00:00 : Midnight
-                            01:05 : 1st overlap
-                            02:11 : 2nd overlap
-                            03:16 : 3rd overlap
-                            04:22 : 4th overlap
-                            05:27 : 5th overlap
-                        section Day (6AM-12PM)
-                            06:33 : 6th overlap
-                            07:38 : 7th overlap
-                            08:44 : 8th overlap
-                            09:49 : 9th overlap
-                            10:55 : 10th overlap
-                        section Day (12PM-6PM)
-                            12:00 : Noon
-                            13:05 : 12th overlap
-                            14:11 : 13th overlap
-                            15:16 : 14th overlap
-                            16:22 : 15th overlap
-                            17:27 : 16th overlap
-                        section Night (6PM-12AM)
-                            18:33 : 17th overlap
-                            19:38 : 18th overlap
-                            20:44 : 19th overlap
-                            21:49 : 20th overlap
-                            22:55 : 21st overlap
-                </div>
-            </div>
+        <div class="card">
+           <h2>🌀 Sacred Portal Ring</h2>
+    
+           <div class="portal-ring-container">
+               <!-- The sacred ring of 22 portals -->
+               <div class="portal-ring" id="portal-ring">
+                   <!-- Portals will be generated by JavaScript -->
+               </div>
+        
+               <div class="portal-info" id="portal-info">
+                   <div class="hebrew-letter" id="portal-hebrew">א</div>
+                   <div class="portal-name" id="portal-name">Aleph — First Breath</div>
+                   <div class="portal-time" id="portal-time">12:00:00 AM</div>
+                   <div class="portal-desc" id="portal-desc">The beginning of all cycles</div>
+               </div>
+        
+               <div class="portal-controls">
+                   <button id="spin-left">⟲ Spin Left</button>
+                   <button id="reset-view">Reset View</button>
+                   <button id="spin-right">⟳ Spin Right</button>
+               </div>
+           </div>
+    
+           <div class="timeline-legend">
+               <div class="legend-item">
+                   <span class="legend-color day-color"></span>
+                   <span>Day Portals (6AM-6PM)</span>
+               </div>
+               <div class="legend-item">
+                   <span class="legend-color night-color"></span>
+                   <span>Night Portals (6PM-6AM)</span>
+               </div>
+               <div class="legend-item">
+                   <span class="legend-color current-color"></span>
+                   <span>Current Portal</span>
+               </div>
+           </div>
         </div>
         
         <div class="panel">
@@ -269,187 +447,483 @@
     </div>
 
     <script>
-        // Initialize Mermaid
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'dark',
-            securityLevel: 'loose',
-            flowchart: { useMaxWidth: false }
+// ============================================
+// SACRED PORTAL DATA - 22 Hebrew Letters
+// ============================================
+const sacredPortals = [
+    { hebrew: "א", name: "Aleph", desc: "The First Breath of Creation", time: "00:00:00" },
+    { hebrew: "ב", name: "Bet", desc: "House of the Divine", time: "01:05:27" },
+    { hebrew: "ג", name: "Gimel", desc: "Cosmic Nourishment", time: "02:10:55" },
+    { hebrew: "ד", name: "Dalet", desc: "Doorway to Wisdom", time: "03:16:22" },
+    { hebrew: "ה", name: "He", desc: "Window to Heaven", time: "04:21:49" },
+    { hebrew: "ו", name: "Vav", desc: "Connecting Above & Below", time: "05:27:16" },
+    { hebrew: "ז", name: "Zayin", desc: "Sacred Sustenance", time: "06:32:43" },
+    { hebrew: "ח", name: "Chet", desc: "Life Force Energy", time: "07:38:11" },
+    { hebrew: "ט", name: "Tet", desc: "Hidden Goodness", time: "08:43:38" },
+    { hebrew: "י", name: "Yod", desc: "Divine Spark", time: "09:49:05" },
+    { hebrew: "כ", name: "Kaf", desc: "Crown of Manifestation", time: "10:54:33" },
+    { hebrew: "ל", name: "Lamed", desc: "Teaching Heart", time: "12:00:00" },
+    { hebrew: "מ", name: "Mem", desc: "Waters of Wisdom", time: "13:05:27" },
+    { hebrew: "נ", name: "Nun", desc: "Eternal Faithfulness", time: "14:10:55" },
+    { hebrew: "ס", name: "Samekh", desc: "Divine Support", time: "15:16:22" },
+    { hebrew: "ע", name: "Ayin", desc: "Inner Vision", time: "16:21:49" },
+    { hebrew: "פ", name: "Pe", desc: "Mouth of Creation", time: "17:27:16" },
+    { hebrew: "צ", name: "Tsadi", desc: "Righteous Path", time: "18:32:43" },
+    { hebrew: "ק", name: "Qof", desc: "Holiness in Time", time: "19:38:11" },
+    { hebrew: "ר", name: "Resh", desc: "Higher Consciousness", time: "20:43:38" },
+    { hebrew: "ש", name: "Shin", desc: "Fire of Transformation", time: "21:49:05" },
+    { hebrew: "ת", name: "Tav", desc: "Completion & Truth", time: "22:54:33" }
+];
+
+// ============================================
+// GLOBAL VARIABLES
+// ============================================
+let currentTimeInMinutes = 0;
+let isRealTime = true;
+let realTimeInterval;
+let portalRotation = 0;
+
+// ============================================
+// MAIN CLOCK FUNCTIONS
+// ============================================
+
+// Calculate all 22 overlap times
+function calculateOverlapTimes() {
+    const overlaps = [];
+    const interval = 12/11; // hours between overlaps
+    
+    for (let i = 0; i < 22; i++) {
+        const totalMinutes = i * interval * 60;
+        const hours = Math.floor(totalMinutes / 60) % 24;
+        const minutes = Math.floor(totalMinutes % 60);
+        const seconds = Math.floor((totalMinutes % 1) * 60);
+        
+        const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        const period = hours < 12 ? 'AM' : 'PM';
+        const displayHours = hours % 12 || 12;
+        const displayString = `${displayHours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${period}`;
+        
+        // Determine if day (6 AM to 6 PM) or night
+        const isDay = (hours >= 6 && hours < 18);
+        
+        overlaps.push({
+            index: i + 1,
+            hours: hours,
+            minutes: minutes,
+            seconds: seconds,
+            timeString: timeString,
+            displayString: displayString,
+            totalMinutes: totalMinutes,
+            isDay: isDay
+        });
+    }
+    
+    return overlaps;
+}
+
+// Display overlap list
+function displayOverlapList() {
+    const overlaps = calculateOverlapTimes();
+    const listContainer = document.getElementById('overlap-list');
+    listContainer.innerHTML = '';
+    
+    overlaps.forEach(overlap => {
+        const item = document.createElement('div');
+        item.className = `overlap-item ${overlap.isDay ? 'day-overlap' : 'night-overlap'}`;
+        item.dataset.index = overlap.index - 1;
+        item.innerHTML = `
+            <strong>#${overlap.index}</strong> - ${overlap.displayString}
+            <span style="float: right; font-size: 0.9rem;">
+                ${overlap.isDay ? '☀️ Day' : '🌙 Night'}
+            </span>
+        `;
+        
+        // Click to select this portal
+        item.addEventListener('click', function() {
+            selectPortal(overlap.index - 1);
+            isRealTime = false;
         });
         
-        // Calculate all overlap times
-        function calculateOverlaps() {
-            const overlaps = [];
-            const interval = 12/11; // hours
-            
-            for (let i = 0; i < 22; i++) {
-                const totalMinutes = i * interval * 60;
-                const hours = Math.floor(totalMinutes / 60) % 24;
-                const minutes = Math.floor(totalMinutes % 60);
-                const seconds = Math.floor((totalMinutes % 1) * 60);
-                
-                const displayHours = hours % 12 || 12;
-                const period = hours < 12 ? 'AM' : 'PM';
-                const displayStr = `${displayHours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${period}`;
-                
-                overlaps.push({
-                    index: i + 1,
-                    hours, minutes, seconds,
-                    totalMinutes,
-                    displayStr,
-                    isDay: hours >= 6 && hours < 18
-                });
+        listContainer.appendChild(item);
+    });
+}
+
+// Clock visualization
+function updateClock(timeInMinutes) {
+    const hourHand = document.getElementById('hour-hand');
+    const minuteHand = document.getElementById('minute-hand');
+    const secondHand = document.getElementById('second-hand');
+    
+    // Calculate angles
+    const minutes = timeInMinutes % 60;
+    const hours = Math.floor(timeInMinutes / 60) % 12;
+    const seconds = (timeInMinutes % 1) * 60;
+    
+    const minuteAngle = minutes * 6; // 360° / 60 = 6° per minute
+    const hourAngle = (hours * 30) + (minutes * 0.5); // 360° / 12 = 30° per hour, 0.5° per minute
+    const secondAngle = seconds * 6;
+    
+    // Apply rotations
+    hourHand.style.transform = `translateX(-50%) rotate(${hourAngle}deg)`;
+    minuteHand.style.transform = `translateX(-50%) rotate(${minuteAngle}deg)`;
+    secondHand.style.transform = `translateX(-50%) rotate(${secondAngle}deg)`;
+    
+    // Update time display
+    const totalSeconds = Math.floor(timeInMinutes * 60);
+    const displayHours = Math.floor(totalSeconds / 3600) % 24;
+    const displayMinutes = Math.floor((totalSeconds % 3600) / 60);
+    const displaySeconds = totalSeconds % 60;
+    
+    document.getElementById('current-time').textContent = 
+        `Current time: ${displayHours.toString().padStart(2, '0')}:${displayMinutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+}
+
+// Find nearest overlap and time to next overlap
+function findNearestOverlap(currentTimeInMinutes) {
+    const overlaps = calculateOverlapTimes();
+    let nearestOverlap = null;
+    let minDiff = Infinity;
+    let nextOverlap = null;
+    let nextDiff = Infinity;
+    
+    overlaps.forEach(overlap => {
+        const overlapMinutes = overlap.totalMinutes;
+        const diff = overlapMinutes - currentTimeInMinutes;
+        const absDiff = Math.abs(diff);
+        
+        if (absDiff < minDiff) {
+            minDiff = absDiff;
+            nearestOverlap = overlap;
+        }
+        
+        if (diff > 0 && diff < nextDiff) {
+            nextDiff = diff;
+            nextOverlap = overlap;
+        }
+    });
+    
+    // If no future overlap found (past 22:55), next is midnight
+    if (!nextOverlap) {
+        nextOverlap = overlaps[0];
+        nextDiff = (24 * 60 - currentTimeInMinutes) + nextOverlap.totalMinutes;
+    }
+    
+    return {
+        nearest: nearestOverlap,
+        next: nextOverlap,
+        timeToNext: nextDiff
+    };
+}
+
+// Update overlap status
+function updateOverlapStatus(currentTimeInMinutes) {
+    const { next, timeToNext } = findNearestOverlap(currentTimeInMinutes);
+    
+    const hoursToNext = Math.floor(timeToNext / 60);
+    const minutesToNext = Math.floor(timeToNext % 60);
+    const secondsToNext = Math.floor((timeToNext % 1) * 60);
+    
+    document.getElementById('overlap-status').textContent = 
+        `Next overlap in: ${hoursToNext}h ${minutesToNext}m ${secondsToNext}s`;
+    document.getElementById('next-overlap-time').textContent = 
+        `At ${next.displayString}`;
+}
+
+// Initialize clock numbers
+function initializeClockNumbers() {
+    const numbersContainer = document.getElementById('clock-numbers');
+    
+    for (let i = 1; i <= 12; i++) {
+        const numberDiv = document.createElement('div');
+        numberDiv.className = 'number';
+        numberDiv.textContent = i;
+        
+        // Position numbers around the clock
+        const angle = (i * 30 - 90) * (Math.PI / 180);
+        const radius = 130;
+        const x = 150 + radius * Math.cos(angle);
+        const y = 150 + radius * Math.sin(angle);
+        
+        numberDiv.style.left = `${x - 15}px`;
+        numberDiv.style.top = `${y - 15}px`;
+        
+        numbersContainer.appendChild(numberDiv);
+    }
+}
+
+// ============================================
+// SACRED PORTAL RING FUNCTIONS
+// ============================================
+
+// Create the portal ring visualization
+function createPortalRing() {
+    const ring = document.getElementById('portal-ring');
+    ring.innerHTML = '';
+    
+    const radius = 180;
+    const centerX = 200;
+    const centerY = 200;
+    
+    // Create connection lines first (so they're behind)
+    for (let i = 0; i < 22; i++) {
+        const nextI = (i + 1) % 22;
+        const angle1 = (i * (360/22) - 90) * (Math.PI / 180);
+        const angle2 = (nextI * (360/22) - 90) * (Math.PI / 180);
+        
+        const x1 = centerX + radius * Math.cos(angle1);
+        const y1 = centerY + radius * Math.sin(angle1);
+        const x2 = centerX + radius * Math.cos(angle2);
+        const y2 = centerY + radius * Math.sin(angle2);
+        
+        const line = document.createElement('div');
+        line.className = 'connection-line';
+        
+        const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+        
+        line.style.width = length + 'px';
+        line.style.left = x1 + 'px';
+        line.style.top = y1 + 'px';
+        line.style.transform = `rotate(${angle}deg)`;
+        
+        ring.appendChild(line);
+    }
+    
+    // Create portal dots
+    for (let i = 0; i < 22; i++) {
+        const portal = sacredPortals[i];
+        const angle = (i * (360/22) - 90) * (Math.PI / 180);
+        
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        
+        const portalDot = document.createElement('div');
+        
+        // Determine if this portal is day or night
+        const hourNum = parseInt(portal.time.split(':')[0]);
+        const isDay = hourNum >= 6 && hourNum < 18;
+        
+        portalDot.className = `portal-dot ${isDay ? 'day-portal' : 'night-portal'}`;
+        
+        portalDot.style.left = (x - 20) + 'px';
+        portalDot.style.top = (y - 20) + 'px';
+        portalDot.dataset.index = i;
+        
+        portalDot.innerHTML = `
+            <div class="hebrew-char">${portal.hebrew}</div>
+            <div class="portal-number">${i + 1}</div>
+        `;
+        
+        // Click event
+        portalDot.addEventListener('click', function() {
+            selectPortal(i);
+            isRealTime = false;
+        });
+        
+        // Hover events
+        portalDot.addEventListener('mouseenter', function() {
+            const currentPortalIndex = findCurrentPortalIndex();
+            if (i !== currentPortalIndex) {
+                portalDot.style.transform = 'scale(1.3)';
             }
-            return overlaps;
-        }
+        });
         
-        // Update clock display
-        function updateClock(minutes) {
-            const hourAngle = (minutes / 60 * 30) % 360;
-            const minuteAngle = (minutes % 60) * 6;
-            
-            document.getElementById('hour-hand').style.transform = 
-                `translateX(-50%) rotate(${hourAngle}deg)`;
-            document.getElementById('minute-hand').style.transform = 
-                `translateX(-50%) rotate(${minuteAngle}deg)`;
-            
-            // Update time display
-            const totalSeconds = Math.floor(minutes * 60);
-            const hrs = Math.floor(totalSeconds / 3600) % 24;
-            const mins = Math.floor((totalSeconds % 3600) / 60);
-            const secs = totalSeconds % 60;
-            
-            document.getElementById('current-time').textContent = 
-                `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-        
-        // Find next overlap
-        function findNextOverlap(currentMinutes) {
-            const overlaps = calculateOverlaps();
-            let nextOverlap = null;
-            let minDiff = Infinity;
-            
-            for (const overlap of overlaps) {
-                const diff = overlap.totalMinutes - currentMinutes;
-                if (diff > 0 && diff < minDiff) {
-                    minDiff = diff;
-                    nextOverlap = overlap;
-                }
+        portalDot.addEventListener('mouseleave', function() {
+            const currentPortalIndex = findCurrentPortalIndex();
+            if (i !== currentPortalIndex) {
+                portalDot.style.transform = 'scale(1)';
             }
-            
-            // If no future overlap, use first one tomorrow
-            if (!nextOverlap) {
-                nextOverlap = overlaps[0];
-                minDiff = (24*60 - currentMinutes) + nextOverlap.totalMinutes;
-            }
-            
-            return { overlap: nextOverlap, diff: minDiff };
+        });
+        
+        ring.appendChild(portalDot);
+    }
+    
+    // Select current portal based on real time
+    const currentPortalIndex = findCurrentPortalIndex();
+    selectPortal(currentPortalIndex);
+}
+
+// Find which portal corresponds to current time
+function findCurrentPortalIndex() {
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+    const interval = (12/11) * 60; // minutes between overlaps
+    
+    // Find closest portal
+    let closestIndex = 0;
+    let minDiff = Infinity;
+    
+    for (let i = 0; i < 22; i++) {
+        const portalMinutes = i * interval;
+        const diff = Math.abs(portalMinutes - currentMinutes);
+        
+        // Consider wrapping around midnight
+        const diffWrapped = Math.abs(portalMinutes - (currentMinutes - 24*60));
+        
+        if (diff < minDiff) {
+            minDiff = diff;
+            closestIndex = i;
         }
         
-        // Update overlap list
-        function updateOverlapList() {
-            const overlaps = calculateOverlaps();
-            const list = document.getElementById('overlap-list');
-            list.innerHTML = '';
-            
-            overlaps.forEach(overlap => {
-                const item = document.createElement('div');
-                item.className = 'overlap-item';
-                item.innerHTML = `
-                    <strong>#${overlap.index}</strong> — ${overlap.displayStr}
-                    <span style="float: right; color: ${overlap.isDay ? '#ff8c00' : '#40e0d0'};">
-                        ${overlap.isDay ? '☀️' : '🌙'}
-                    </span>
-                `;
-                list.appendChild(item);
-            });
+        if (diffWrapped < minDiff) {
+            minDiff = diffWrapped;
+            closestIndex = i;
         }
+    }
+    
+    return closestIndex;
+}
+
+// Select a specific portal
+function selectPortal(index) {
+    const portal = sacredPortals[index];
+    
+    // Update portal info display
+    document.getElementById('portal-hebrew').textContent = portal.hebrew;
+    document.getElementById('portal-name').textContent = `${portal.name} — ${portal.desc}`;
+    
+    // Format time with AM/PM
+    const [hours, minutes, seconds] = portal.time.split(':');
+    const hourNum = parseInt(hours);
+    const ampm = hourNum >= 12 ? 'PM' : 'AM';
+    const displayHour = hourNum % 12 || 12;
+    document.getElementById('portal-time').textContent = 
+        `${displayHour}:${minutes}:${seconds} ${ampm}`;
+    
+    document.getElementById('portal-desc').textContent = `Portal ${index + 1}/22`;
+    
+    // Update portal dot visuals
+    document.querySelectorAll('.portal-dot').forEach((dot, i) => {
+        dot.classList.remove('current-portal');
         
-        // Update next overlap display
-        function updateNextOverlap(currentMinutes) {
-            const { overlap, diff } = findNextOverlap(currentMinutes);
-            const hrs = Math.floor(diff / 60);
-            const mins = Math.floor(diff % 60);
-            const secs = Math.floor((diff % 1) * 60);
-            
-            document.getElementById('next-overlap').innerHTML = `
-                <strong>Next overlap:</strong> ${overlap.displayStr}<br>
-                <small>In ${hrs}h ${mins}m ${secs}s</small>
-            `;
+        if (i === index) {
+            dot.classList.add('current-portal');
+            dot.style.transform = 'scale(1.2)';
+        } else {
+            dot.style.transform = 'scale(1)';
         }
+    });
+    
+    // Update the main clock to this portal's time
+    const interval = (12/11) * 60;
+    currentTimeInMinutes = index * interval;
+    updateClock(currentTimeInMinutes);
+    updateOverlapStatus(currentTimeInMinutes);
+    
+    // Highlight corresponding item in overlap list
+    document.querySelectorAll('.overlap-item').forEach((item, i) => {
+        if (i === index) {
+            item.style.background = 'rgba(76, 201, 240, 0.2)';
+            item.style.borderLeft = '4px solid #4cc9f0';
+        } else {
+            item.style.background = '';
+            item.style.borderLeft = '';
+        }
+    });
+}
+
+// Add portal ring controls
+function addPortalControls() {
+    const ring = document.getElementById('portal-ring');
+    
+    document.getElementById('spin-left').addEventListener('click', function() {
+        portalRotation -= 30;
+        ring.style.transform = `rotate(${portalRotation}deg)`;
+    });
+    
+    document.getElementById('spin-right').addEventListener('click', function() {
+        portalRotation += 30;
+        ring.style.transform = `rotate(${portalRotation}deg)`;
+    });
+    
+    document.getElementById('reset-view').addEventListener('click', function() {
+        portalRotation = 0;
+        ring.style.transform = `rotate(${portalRotation}deg)`;
         
-        // Main variables
-        let currentMinutes = 0;
-        let isRealTime = true;
-        let timer;
+        // Return to current real-time portal
+        isRealTime = true;
+        const now = new Date();
+        currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+        updateClock(currentTimeInMinutes);
+        updateOverlapStatus(currentTimeInMinutes);
         
-        // Initialize
-        function init() {
-            updateOverlapList();
-            
-            // Start with current time
+        const currentPortalIndex = findCurrentPortalIndex();
+        selectPortal(currentPortalIndex);
+    });
+}
+
+// ============================================
+// MAIN INITIALIZATION
+// ============================================
+
+function init() {
+    // Initialize displays
+    displayOverlapList();
+    initializeClockNumbers();
+    createPortalRing();
+    addPortalControls();
+    
+    // Start with current real time
+    const now = new Date();
+    currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+    updateClock(currentTimeInMinutes);
+    updateOverlapStatus(currentTimeInMinutes);
+    
+    // Set up real-time updates
+    realTimeInterval = setInterval(() => {
+        if (isRealTime) {
             const now = new Date();
-            currentMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
-            updateClock(currentMinutes);
-            updateNextOverlap(currentMinutes);
+            currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+            updateClock(currentTimeInMinutes);
+            updateOverlapStatus(currentTimeInMinutes);
             
-            // Real-time updates
-            timer = setInterval(() => {
-                if (isRealTime) {
-                    const now = new Date();
-                    currentMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
-                    updateClock(currentMinutes);
-                    updateNextOverlap(currentMinutes);
-                }
-            }, 1000);
-            
-            // Button events
-            document.getElementById('prev-btn').addEventListener('click', () => {
-                isRealTime = false;
-                const overlaps = calculateOverlaps();
-                const { overlap } = findNextOverlap(currentMinutes);
-                let idx = overlap.index - 2;
-                if (idx < 0) idx = overlaps.length - 1;
-                
-                currentMinutes = overlaps[idx].totalMinutes;
-                updateClock(currentMinutes);
-                updateNextOverlap(currentMinutes);
-            });
-            
-            document.getElementById('next-btn').addEventListener('click', () => {
-                isRealTime = false;
-                const { overlap } = findNextOverlap(currentMinutes);
-                currentMinutes = overlap.totalMinutes;
-                updateClock(currentMinutes);
-                updateNextOverlap(currentMinutes);
-            });
-            
-            document.getElementById('real-btn').addEventListener('click', () => {
-                isRealTime = true;
-                const now = new Date();
-                currentMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
-                updateClock(currentMinutes);
-                updateNextOverlap(currentMinutes);
-            });
-            
-            // Click on overlap items
-            document.getElementById('overlap-list').addEventListener('click', (e) => {
-                const item = e.target.closest('.overlap-item');
-                if (item) {
-                    const items = Array.from(document.getElementById('overlap-list').children);
-                    const index = items.indexOf(item);
-                    const overlaps = calculateOverlaps();
-                    
-                    isRealTime = false;
-                    currentMinutes = overlaps[index].totalMinutes;
-                    updateClock(currentMinutes);
-                    updateNextOverlap(currentMinutes);
-                }
-            });
+            // Update portal ring to show current portal
+            const currentPortalIndex = findCurrentPortalIndex();
+            selectPortal(currentPortalIndex);
         }
+    }, 1000);
+    
+    // Button event listeners
+    document.getElementById('prev-btn').addEventListener('click', () => {
+        isRealTime = false;
+        const overlaps = calculateOverlapTimes();
+        const { nearest } = findNearestOverlap(currentTimeInMinutes);
         
-        // Start everything
-        window.addEventListener('load', init);
+        let prevIndex = nearest.index - 2;
+        if (prevIndex < 0) prevIndex = overlaps.length - 1;
+        
+        currentTimeInMinutes = overlaps[prevIndex].totalMinutes;
+        updateClock(currentTimeInMinutes);
+        updateOverlapStatus(currentTimeInMinutes);
+        selectPortal(prevIndex);
+    });
+    
+    document.getElementById('next-btn').addEventListener('click', () => {
+        isRealTime = false;
+        const overlaps = calculateOverlapTimes();
+        const { nearest } = findNearestOverlap(currentTimeInMinutes);
+        
+        let nextIndex = nearest.index % overlaps.length;
+        currentTimeInMinutes = overlaps[nextIndex].totalMinutes;
+        updateClock(currentTimeInMinutes);
+        updateOverlapStatus(currentTimeInMinutes);
+        selectPortal(nextIndex);
+    });
+    
+    document.getElementById('real-time-btn').addEventListener('click', () => {
+        isRealTime = true;
+        const now = new Date();
+        currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+        updateClock(currentTimeInMinutes);
+        updateOverlapStatus(currentTimeInMinutes);
+        
+        const currentPortalIndex = findCurrentPortalIndex();
+        selectPortal(currentPortalIndex);
+    });
+}
+
+// Start everything when page loads
+window.addEventListener('load', init);               
     </script>
 </body>
 </html>
