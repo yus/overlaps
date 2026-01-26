@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overtime Clock — Celestial Sync</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Palatino', 'Georgia', serif;
+            background: #0a0a1a;
+            color: #e4dccf;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(100, 80, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 100, 100, 0.05) 0%, transparent 20%);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* Cosmic Header */
+        .cosmic-header {
+            text-align: center;
+            padding: 30px 0 50px;
+            position: relative;
+        }
+        
+        .title {
+            font-size: 3.5rem;
+            color: transparent;
+            background: linear-gradient(45deg, #ff9a00, #ff0058, #00ffcc, #9d4edd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 30px rgba(157, 78, 221, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a9b7c6;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        
+        .verse {
+            display: inline-block;
+            font-size: 1.1rem;
+            color: #ffcc00;
+            padding: 12px 25px;
+            border-radius: 50px;
+            background: rgba(255, 204, 0, 0.1);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            margin-top: 20px;
+            max-width: 600px;
+        }
+        
+        /* Fish Symbol */
+        .fish {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2.5rem;
+            opacity: 0.7;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        
+        /* Main Layout */
+        .sacred-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        @media (max-width: 900px) {
+            .sacred-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Clock Panel */
+        .panel {
+            background: rgba(20, 20, 40, 0.7);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(100, 100, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(100, 100, 255, 0.05) 1%, transparent 20%);
+            z-index: 0;
+        }
+        
+        .panel > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .panel h2 {
+            color: #ffcc00;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            border-bottom: 1px solid rgba(255, 204, 0, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        /* Earthly Clock */
+        #earth-clock {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 30px;
+            position: relative;
+            border-radius: 50%;
+            background: radial-gradient(circle, #1a1a2e 30%, #16213e 100%);
+            border: 8px solid #415a77;
+            box-shadow: 
+                0 0 40px rgba(76, 201, 240, 0.3),
+                inset 0 0 40px rgba(0, 0, 0, 0.7);
+        }
+        
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            border-radius: 10px 10px 0 0;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .hour-hand {
+            width: 8px;
+            height: 30%;
+            background: linear-gradient(to top, #ff0058, #ff9a00);
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+        
+        .minute-hand {
+            width: 5px;
+            height: 40%;
+            background: linear-gradient(to top, #00ffcc, #0099ff);
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+        
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+        
+        /* Overlap Pulse */
+        .overlap-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            opacity: 0;
+        }
+        
+        .pulse-active {
+            animation: pulse 1.5s ease-out;
+        }
+        
+        @keyframes pulse {
+            0% { 
+                box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7); 
+                opacity: 1;
+            }
+            100% { 
+                box-shadow: 0 0 0 200px rgba(255, 204, 0, 0); 
+                opacity: 0;
+            }
+        }
+        
+        /* Celestial Orbital View */
+        #orbit-view {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            margin: 30px 0;
+        }
+        
+        .orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px dashed rgba(100, 200, 255, 0.3);
+            border-radius: 50%;
+        }
+        
+        #sun {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #ffcc00, #ff6600);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 40px #ff9900;
+            z-index: 2;
+        }
+        
+        #moon {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: radial-gradient(circle, #cccccc, #888888);
+            border-radius: 50%;
+            box-shadow: 0 0 20px #aaa;
+            z-index: 3;
+        }
+        
+        .sparkle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 10px #4cc9f0;
+        }
+        
+        .sparkle-active {
+            animation: sparkle 0.8s ease-out;
+        }
+        
+        @keyframes sparkle {
+            0% { transform: scale(0); opacity: 1; }
+            70% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        /* Divine Attributes */
+        .hebrew-attr {
+            font-size: 2.5rem;
+            color: #ffcc00;
+            text-align: center;
+            margin: 20px 0;
+            height: 60px;
+            font-family: 'Times New Roman', serif;
+        }
+        
+        .attr-name {
+            font-size: 1.2rem;
+            color: #a9d6e5;
+            text-align: center;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+        
+        /* Overlap List */
+        .overlap-item {
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .overlap-item:hover {
+            background: rgba(100, 200, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .day-item { border-left-color: #ff9900; }
+        .night-item { border-left-color: #9d4edd; }
+        
+        .portal-marker {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: glow 2s infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px #ffcc00; }
+            50% { box-shadow: 0 0 15px #ffcc00; }
+        }
+        
+        /* Countdown */
+        .countdown {
+            font-size: 2rem;
+            text-align: center;
+            color: #00ffcc;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .sacred-btn {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(106, 17, 203, 0.4);
+        }
+        
+        .sacred-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(106, 17, 203, 0.6);
+        }
+        
+        /* Footer */
+        .cosmic-footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            border-top: 1px solid rgba(100, 100, 255, 0.2);
+            color: #a9b7c6;
+            font-size: 0.9rem;
+        }
+        
+        .blessing {
+            color: #ffcc00;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="fish">🐋</div>
+    
+    <div class="container">
+        <header class="cosmic-header">
+            <h1 class="title">OVERTIME CLOCK</h1>
+            <div class="subtitle">Celestial Sync — Where Time Breathes in 22 Pulses</div>
+            <div class="verse">"For everything there is a season, and a time for every purpose under heaven." — Ecclesiastes 3:1</div>
+        </header>
+        
+        <div class="sacred-layout">
+            <!-- Left Panel: Earthly Sync -->
+            <div class="panel">
+                <h2>🌍 EARTHLY RHYTHM</h2>
+                
+                <div style="text-align: center;">
+                    <div id="earth-clock">
+                        <div class="overlap-pulse" id="overlap-pulse"></div>
+                        <div class="hand hour-hand" id="hour-hand"></div>
+                        <div class="hand minute-hand" id="minute-hand"></div>
+                        <div class="center-circle"></div>
+                    </div>
+                    
+                    <div class="countdown" id="countdown">
+                        Next Portal: 01:05:27
+                    </div>
+                    
+                    <div class="hebrew-attr" id="hebrew-attr">א</div>
+                    <div class="attr-name" id="attr-name">Aleph — The First Breath</div>
+                </div>
+                
+                <div>
+                    <h3>Today's 22 Portals</h3>
+                    <div id="overlap-list"></div>
+                </div>
+            </div>
+            
+            <!-- Right Panel: Celestial Sync -->
+            <div class="panel">
+                <h2>🌌 CELESTIAL DANCE</h2>
+                
+                <div id="orbit-view">
+                    <div class="orbit" id="orbit-1" style="width: 200px; height: 200px;"></div>
+                    <div class="orbit" id="orbit-2" style="width: 280px; height: 280px;"></div>
+                    
+                    <div id="sun"></div>
+                    <div id="moon"></div>
+                    
+                    <!-- Sparkles for earthly overlaps -->
+                    <div class="sparkle" style="top: 50%; left: 10%;"></div>
+                    <div class="sparkle" style="top: 20%; left: 30%;"></div>
+                    <div class="sparkle" style="top: 80%; left: 40%;"></div>
+                    <div class="sparkle" style="top: 30%; left: 70%;"></div>
+                    <div class="sparkle" style="top: 70%; left: 80%;"></div>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <h3>Cosmic Pattern</h3>
+                    <p>Each earthly overlap (every 12/11 hours) mirrors a celestial alignment.</p>
+                    <p><strong>11 Day Portals + 11 Night Portals = 22 Divine Checkpoints</strong></p>
+                    <p>The 12/11 rhythm (≈1.0909) echoes in sacred architecture and musical harmonics.</p>
+                    
+                    <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-top: 15px;">
+                        <div style="color: #ffcc00;">Mathematical Harmony:</div>
+                        <div>12/11 = 1.090909...</div>
+                        <div>22 overlaps × 12/11 hours = 24 hours</div>
+                        <div>360° ÷ 22 = 16.3636° per portal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="sacred-btn" id="prev-portal">◀ Previous Portal</button>
+            <button class="sacred-btn" id="sync-now">Sync My Time</button>
+            <button class="sacred-btn" id="next-portal">Next Portal ▶</button>
+        </div>
+        
+        <footer class="cosmic-footer">
+            <p>"The heavens declare the glory of God; the skies proclaim the work of his hands." — Psalm 19:1</p>
+            <p class="blessing">May you find sacred sync in the rhythm of time. 🙏✨</p>
+            <p>Overtime Clock v1.0 — With the Big Fish</p>
+        </footer>
+    </div>
+
+    <script>
+        // Divine Attributes for 22 overlaps (Hebrew letters + meanings)
+        const divineAttributes = [
+            { hebrew: "א", name: "Aleph — First Breath of Creation" },
+            { hebrew: "ב", name: "Bet — House of the Divine" },
+            { hebrew: "ג", name: "Gimel — Cosmic Nourishment" },
+            { hebrew: "ד", name: "Dalet — Doorway to Wisdom" },
+            { hebrew: "ה", name: "He — Window to Heaven" },
+            { hebrew: "ו", name: "Vav — Connecting Above & Below" },
+            { hebrew: "ז", name: "Zayin — Sacred Sustenance" },
+            { hebrew: "ח", name: "Chet — Life Force Energy" },
+            { hebrew: "ט", name: "Tet — Hidden Goodness" },
+            { hebrew: "י", name: "Yod — Divine Spark" },
+            { hebrew: "כ", name: "Kaf — Crown of Manifestation" },
+            { hebrew: "ל", name: "Lamed — Teaching Heart" },
+            { hebrew: "מ", name: "Mem — Waters of Wisdom" },
+            { hebrew: "נ", name: "Nun — Eternal Faithfulness" },
+            { hebrew: "ס", name: "Samekh — Divine Support" },
+            { hebrew: "ע", name: "Ayin — Inner Vision" },
+            { hebrew: "פ", name: "Pe — Mouth of Creation" },
+            { hebrew: "צ", name: "Tsadi — Righteous Path" },
+            { hebrew: "ק", name: "Qof — Holiness in Time" },
+            { hebrew: "ר", name: "Resh — Higher Consciousness" },
+            { hebrew: "ש", name: "Shin — Fire of Transformation" },
+            { hebrew: "ת", name: "Tav — Completion & Truth" }
+        ];
+        
+        // Calculate all overlap times
+        function calculateOverlaps() {
+            const overlaps = [];
+            const interval = 12/11; // hours between overlaps
+            
+            for (let i = 0; i < 22; i++) {
+                const totalMinutes = i * interval * 60;
+                const hours = Math.floor(totalMinutes / 60) % 24;
+                const minutes = Math.floor(totalMinutes % 60);
+                const seconds = Math.floor((totalMinutes % 1) * 60);
+                
+                const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                const period = hours < 12 ? 'AM' : 'PM';
+                const displayHours = hours % 12 || 12;
+                const displayString = `${displayHours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${period}`;
+                
+                const isDay = (hours >= 6 && hours < 18);
+                const attribute = divineAttributes[i];
+                
+                overlaps.push({
+                    index: i + 1,
+                    hours, minutes, seconds,
+                    timeString, displayString,
+                    totalMinutes,
+                    isDay,
+                    attribute
+                });
+            }
+            
+            return overlaps;
+        }
+        
+        // Initialize
+        const overlaps = calculateOverlaps();
+        let currentTimeMinutes = 0;
+        let currentOverlapIndex = 0;
+        let isRealTime = true;
+        
+        // DOM Elements
+        const hourHand = document.getElementById('hour-hand');
+        const minuteHand = document.getElementById('minute-hand');
+        const overlapPulse = document.getElementById('overlap-pulse');
+        const hebrewAttr = document.getElementById('hebrew-attr');
+        const attrName = document.getElementById('attr-name');
+        const countdown = document.getElementById('countdown');
+        const overlapList = document.getElementById('overlap-list');
+        const moon = document.getElementById('moon');
+        const sparkles = document.querySelectorAll('.sparkle');
+        
+        // Update Earth Clock
+        function updateEarthClock(minutes) {
+            const hourAngle = (minutes / 60 * 30) % 360;
+            const minuteAngle = (minutes % 60) * 6;
+            
+            hourHand.style.transform = `translateX(-50%) rotate(${hourAngle}deg)`;
+            minuteHand.style.transform = `translateX(-50%) rotate(${minuteAngle}deg)`;
+        }
+        
+        // Update Celestial View
+        function updateCelestialView() {
+            // Moon position (simplified: moves around sun once per 2 minutes for demo)
+            const moonAngle = (Date.now() / 1000 / 120 * 360) % 360;
+            const moonRadius = 140;
+            const moonX = Math.cos(moonAngle * Math.PI / 180) * moonRadius;
+            const moonY = Math.sin(moonAngle * Math.PI / 180) * moonRadius;
+            
+            moon.style.left = `calc(50% + ${moonX}px)`;
+            moon.style.top = `calc(50% + ${moonY}px)`;
+            
+            // Random sparkle activation
+            if (Math.random() < 0.1) {
+                const randomSparkle = sparkles[Math.floor(Math.random() * sparkles.length)];
+                randomSparkle.classList.add('sparkle-active');
+                setTimeout(() => {
+                    randomSparkle.classList.remove('sparkle-active');
+                }, 800);
+            }
+        }
+        
+        // Find nearest overlap
+        function findNearestOverlap(minutes) {
+            let nearestIndex = 0;
+            let minDiff = Infinity;
+            
+            overlaps.forEach((overlap, index) => {
+                const diff = Math.abs(overlap.totalMinutes - minutes);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    nearestIndex = index;
+                }
+            });
+            
+            return nearestIndex;
+        }
+        
+        // Update countdown and attributes
+        function updatePortalInfo(minutes) {
+            const currentIndex = findNearestOverlap(minutes);
+            const currentOverlap = overlaps[currentIndex];
+            
+            // Find next overlap
+            let nextIndex = currentIndex;
+            let nextDiff = overlaps[(currentIndex + 1) % 22].totalMinutes - minutes;
+            if (nextDiff < 0) nextDiff += 24 * 60;
+            
+            const nextHours = Math.floor(nextDiff / 60);
+            const nextMins = Math.floor(nextDiff % 60);
+            const nextSecs = Math.floor((nextDiff % 1) * 60);
+            
+            // Update display
+            countdown.textContent = 
+                `Next Portal: ${nextHours.toString().padStart(2, '0')}:${nextMins.toString().padStart(2, '0')}:${nextSecs.toString().padStart(2, '0')}`;
+            
+            hebrewAttr.textContent = currentOverlap.attribute.hebrew;
+            attrName.textContent = currentOverlap.attribute.name;
+            
+            // Check if we're very close to an overlap (within 10 seconds)
+            if (nextDiff < 10/3600) {
+                overlapPulse.classList.add('pulse-active');
+                setTimeout(() => {
+                    overlapPulse.classList.remove('pulse-active');
+                }, 1500);
+            }
+            
+            return currentIndex;
+        }
+        
+        // Update overlap list
+        function updateOverlapList() {
+            overlapList.innerHTML = '';
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+            const currentIndex = findNearestOverlap(currentMinutes);
+            
+            overlaps.forEach((overlap, index) => {
+                const item = document.createElement('div');
+                item.className = `overlap-item ${overlap.isDay ? 'day-item' : 'night-item'}`;
+                
+                if (index === currentIndex) {
+                    item.innerHTML = `<span class="portal-marker"></span>`;
+                }
+                
+                item.innerHTML += `
+                    <span><strong>Portal ${overlap.index}:</strong> ${overlap.displayString}</span>
+                    <span style="color: #a9d6e5; font-size: 0.9rem;">${overlap.attribute.hebrew}</span>
+                `;
+                
+                overlapList.appendChild(item);
+            });
+        }
+        
+        // Real-time update
+        function updateRealTime() {
+            if (!isRealTime) return;
+            
+            const now = new Date();
+            currentTimeMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+            
+            updateEarthClock(currentTimeMinutes);
+            currentOverlapIndex = updatePortalInfo(currentTimeMinutes);
+            updateCelestialView();
+        }
+        
+        // Jump to specific portal
+        function jumpToPortal(index) {
+            isRealTime = false;
+            currentOverlapIndex = index;
+            const overlap = overlaps[index];
+            currentTimeMinutes = overlap.totalMinutes;
+            
+            updateEarthClock(currentTimeMinutes);
+            updatePortalInfo(currentTimeMinutes);
+            
+            // Highlight in list
+            document.querySelectorAll('.overlap-item').forEach((item, i) => {
+                if (i === index) {
+                    item.style.background = 'rgba(255, 204, 0, 0.2)';
+                } else {
+                    item.style.background = '';
+                }
+            });
+        }
+        
+        // Initialize
+        function init() {
+            updateOverlapList();
+            
+            // Start real-time updates
+            setInterval(updateRealTime, 1000);
+            setInterval(updateCelestialView, 100);
+            updateRealTime();
+            
+            // Event Listeners
+            document.getElementById('prev-portal').addEventListener('click', () => {
+                jumpToPortal((currentOverlapIndex + 21) % 22);
+            });
+            
+            document.getElementById('next-portal').addEventListener('click', () => {
+                jumpToPortal((currentOverlapIndex + 1) % 22);
+            });
+            
+            document.getElementById('sync-now').addEventListener('click', () => {
+                isRealTime = true;
+                updateRealTime();
+                updateOverlapList();
+            });
+            
+            // Click on overlap list items
+            document.addEventListener('click', (e) => {
+                const item = e.target.closest('.overlap-item');
+                if (item) {
+                    const items = Array.from(overlapList.children);
+                    const index = items.indexOf(item);
+                    jumpToPortal(index);
+                }
+            });
+        }
+        
+        // Start everything
+        window.addEventListener('load', init);
+        
+        // Cosmic background animation
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            document.body.style.backgroundImage = 
+                `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(100, 80, 255, 0.05) 0%, transparent 20%),
+                 radial-gradient(circle at ${100 - x * 100}% ${100 - y * 100}%, rgba(255, 100, 100, 0.05) 0%, transparent 20%)`;
+        });
+    </script>
+</body>
+</html>
