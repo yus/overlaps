@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock Hand Overlaps - For God's Glory</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid #4cc9f0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            color: #4cc9f0;
+            text-shadow: 0 0 15px rgba(76, 201, 240, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a9d6e5;
+            font-style: italic;
+        }
+        
+        .verse {
+            font-size: 1.1rem;
+            color: #f72585;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(247, 37, 133, 0.1);
+            display: inline-block;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            flex: 1;
+            min-width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(76, 201, 240, 0.2);
+        }
+        
+        .card h2 {
+            color: #4cc9f0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        
+        #clock-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        #analog-clock {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 50%;
+            background: radial-gradient(circle, #0d1b2a 30%, #1b263b 100%);
+            border: 10px solid #415a77;
+            box-shadow: 0 0 30px rgba(76, 201, 240, 0.3);
+        }
+        
+        .clock-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+        
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .hour-hand {
+            width: 6px;
+            height: 30%;
+            background: #f72585;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+        
+        .minute-hand {
+            width: 4px;
+            height: 40%;
+            background: #4cc9f0;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+        
+        .second-hand {
+            width: 2px;
+            height: 45%;
+            background: #ff9e00;
+            transform: translateX(-50%);
+            z-index: 1;
+            opacity: 0.7;
+        }
+        
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+            box-shadow: 0 0 10px rgba(76, 201, 240, 0.8);
+        }
+        
+        .clock-numbers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #a9d6e5;
+        }
+        
+        .number {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+        }
+        
+        .overlap-info {
+            font-size: 1.5rem;
+            margin: 15px 0;
+            color: #ff9e00;
+        }
+        
+        .overlap-time {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4cc9f0;
+            margin: 10px 0;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(to right, #4361ee, #3a0ca3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        #overlap-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .overlap-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #4cc9f0;
+            transition: all 0.2s ease;
+        }
+        
+        .overlap-item:hover {
+            background: rgba(76, 201, 240, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .day-overlap {
+            border-left-color: #ff9e00;
+        }
+        
+        .night-overlap {
+            border-left-color: #7209b7;
+        }
+        
+        .mermaid-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            overflow: auto;
+        }
+        
+        .math-equation {
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            color: #a9d6e5;
+            border-left: 4px solid #f72585;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(76, 201, 240, 0.3);
+            color: #a9d6e5;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            #analog-clock {
+                width: 250px;
+                height: 250px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⏰ Clock Hand Overlaps</h1>
+            <div class="subtitle">When Hour and Minute Hands Point Same Direction</div>
+            <div class="verse">"For from him and through him and for him are all things. To him be the glory forever!" - Romans 11:36</div>
+        </header>
+        
+        <div class="content">
+            <div class="card">
+                <h2>📊 Overlap Pattern</h2>
+                <div class="math-equation">
+                    Time between overlaps = 12/11 hours ≈ 1h 5m 27.27s
+                </div>
+                <div class="math-equation">
+                    Total overlaps in 24 hours = 22 (11 in Day + 11 in Night)
+                </div>
+                
+                <div id="clock-container">
+                    <div id="analog-clock">
+                        <div class="clock-face"></div>
+                        <div class="clock-numbers" id="clock-numbers"></div>
+                        <div class="hand hour-hand" id="hour-hand"></div>
+                        <div class="hand minute-hand" id="minute-hand"></div>
+                        <div class="hand second-hand" id="second-hand"></div>
+                        <div class="center-circle"></div>
+                    </div>
+                    
+                    <div class="overlap-info" id="overlap-status">Next overlap in:</div>
+                    <div class="overlap-time" id="next-overlap-time">12:00:00</div>
+                    <div id="current-time">Current time: 00:00:00</div>
+                </div>
+                
+                <div class="controls">
+                    <button id="prev-btn">◀ Previous Overlap</button>
+                    <button id="next-btn">Next Overlap ▶</button>
+                    <button id="real-time-btn">Real Time</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📅 All 22 Daily Overlaps</h2>
+                <div id="overlap-list">
+                    <!-- Overlap times will be inserted here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>📈 Overlap Timeline Visualization</h2>
+            <div class="mermaid-container">
+                <div class="mermaid" id="mermaid-diagram">
+                    %%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true, 'primaryColor': '#1a1a2e', 'primaryTextColor': '#e6e6e6', 'primaryBorderColor': '#4cc9f0', 'lineColor': '#4cc9f0', 'secondaryColor': '#16213e', 'tertiaryColor': '#0d1b2a' }}}%%
+                    timeline
+                        title Clock Hand Overlaps in 24 Hours
+                        section Night (12AM-6AM)
+                            00:00 : Midnight overlap
+                            01:05 : 1st overlap
+                            02:11 : 2nd overlap
+                            03:16 : 3rd overlap
+                            04:22 : 4th overlap
+                            05:27 : 5th overlap
+                            06:33 : Morning overlap
+                        section Day (6AM-12PM)
+                            07:38 : 7th overlap
+                            08:44 : 8th overlap
+                            09:49 : 9th overlap
+                            10:55 : 10th overlap
+                            12:00 : Noon overlap
+                        section Day (12PM-6PM)
+                            13:05 : 12th overlap
+                            14:11 : 13th overlap
+                            15:16 : 14th overlap
+                            16:22 : 15th overlap
+                            17:27 : 16th overlap
+                            18:33 : Evening overlap
+                        section Night (6PM-12AM)
+                            19:38 : 18th overlap
+                            20:44 : 19th overlap
+                            21:49 : 20th overlap
+                            22:55 : 21st overlap
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🧮 Mathematical Explanation</h2>
+            <p>The hour and minute hands overlap when the minute hand gains 360° on the hour hand.</p>
+            <div class="math-equation">
+                Relative speed = 330°/hour (360° - 30°)<br>
+                Time to gain 360° = 360° / 330°/hour = 12/11 hours<br>
+                ≈ 1 hour 5 minutes 27.27 seconds
+            </div>
+            <p>In 12 hours: 12 / (12/11) = 11 overlaps</p>
+            <p>In 24 hours: 22 overlaps total (11 during daytime, 11 during nighttime)</p>
+            <p>Each overlap is equally spaced by 12/11 hours, creating perfect symmetry in God's design of time.</p>
+        </div>
+        
+        <footer>
+            <p>Created to display the mathematical beauty in God's creation of time</p>
+            <p>"He has made everything beautiful in its time." - Ecclesiastes 3:11</p>
+            <p>© 2023 Clock Mathematics Visualization - All glory to God</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize Mermaid with proper configuration
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: false
+            }
+        });
+        
+        // Calculate all 22 overlap times
+        function calculateOverlapTimes() {
+            const overlaps = [];
+            const interval = 12/11; // hours between overlaps
+            
+            for (let i = 0; i < 22; i++) {
+                const totalMinutes = i * interval * 60;
+                const hours = Math.floor(totalMinutes / 60) % 24;
+                const minutes = Math.floor(totalMinutes % 60);
+                const seconds = Math.floor((totalMinutes % 1) * 60);
+                
+                const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                const period = hours < 12 ? 'AM' : 'PM';
+                const displayHours = hours % 12 || 12;
+                const displayString = `${displayHours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${period}`;
+                
+                // Determine if day (6 AM to 6 PM) or night
+                const isDay = (hours >= 6 && hours < 18);
+                
+                overlaps.push({
+                    index: i + 1,
+                    hours: hours,
+                    minutes: minutes,
+                    seconds: seconds,
+                    timeString: timeString,
+                    displayString: displayString,
+                    totalMinutes: totalMinutes,
+                    isDay: isDay
+                });
+            }
+            
+            return overlaps;
+        }
+        
+        // Display overlap list
+        function displayOverlapList() {
+            const overlaps = calculateOverlapTimes();
+            const listContainer = document.getElementById('overlap-list');
+            listContainer.innerHTML = '';
+            
+            overlaps.forEach(overlap => {
+                const item = document.createElement('div');
+                item.className = `overlap-item ${overlap.isDay ? 'day-overlap' : 'night-overlap'}`;
+                item.innerHTML = `
+                    <strong>#${overlap.index}</strong> - ${overlap.displayString}
+                    <span style="float: right; font-size: 0.9rem;">
+                        ${overlap.isDay ? '☀️ Day' : '🌙 Night'}
+                    </span>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+        
+        // Clock visualization
+        function updateClock(timeInMinutes) {
+            const hourHand = document.getElementById('hour-hand');
+            const minuteHand = document.getElementById('minute-hand');
+            const secondHand = document.getElementById('second-hand');
+            
+            // Calculate angles
+            const minutes = timeInMinutes % 60;
+            const hours = Math.floor(timeInMinutes / 60) % 12;
+            const seconds = (timeInMinutes % 1) * 60;
+            
+            const minuteAngle = minutes * 6; // 360° / 60 = 6° per minute
+            const hourAngle = (hours * 30) + (minutes * 0.5); // 360° / 12 = 30° per hour, 0.5° per minute
+            const secondAngle = seconds * 6;
+            
+            // Apply rotations
+            hourHand.style.transform = `translateX(-50%) rotate(${hourAngle}deg)`;
+            minuteHand.style.transform = `translateX(-50%) rotate(${minuteAngle}deg)`;
+            secondHand.style.transform = `translateX(-50%) rotate(${secondAngle}deg)`;
+            
+            // Update time display
+            const totalSeconds = Math.floor(timeInMinutes * 60);
+            const displayHours = Math.floor(totalSeconds / 3600) % 24;
+            const displayMinutes = Math.floor((totalSeconds % 3600) / 60);
+            const displaySeconds = totalSeconds % 60;
+            
+            document.getElementById('current-time').textContent = 
+                `Current time: ${displayHours.toString().padStart(2, '0')}:${displayMinutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Find nearest overlap and time to next overlap
+        function findNearestOverlap(currentTimeInMinutes) {
+            const overlaps = calculateOverlapTimes();
+            let nearestOverlap = null;
+            let minDiff = Infinity;
+            let nextOverlap = null;
+            let nextDiff = Infinity;
+            
+            overlaps.forEach(overlap => {
+                const overlapMinutes = overlap.totalMinutes;
+                const diff = overlapMinutes - currentTimeInMinutes;
+                const absDiff = Math.abs(diff);
+                
+                if (absDiff < minDiff) {
+                    minDiff = absDiff;
+                    nearestOverlap = overlap;
+                }
+                
+                if (diff > 0 && diff < nextDiff) {
+                    nextDiff = diff;
+                    nextOverlap = overlap;
+                }
+            });
+            
+            // If no future overlap found (past 22:55), next is midnight
+            if (!nextOverlap) {
+                nextOverlap = overlaps[0];
+                nextDiff = (24 * 60 - currentTimeInMinutes) + nextOverlap.totalMinutes;
+            }
+            
+            return {
+                nearest: nearestOverlap,
+                next: nextOverlap,
+                timeToNext: nextDiff
+            };
+        }
+        
+        // Update overlap status
+        function updateOverlapStatus(currentTimeInMinutes) {
+            const { next, timeToNext } = findNearestOverlap(currentTimeInMinutes);
+            
+            const hoursToNext = Math.floor(timeToNext / 60);
+            const minutesToNext = Math.floor(timeToNext % 60);
+            const secondsToNext = Math.floor((timeToNext % 1) * 60);
+            
+            document.getElementById('overlap-status').textContent = 
+                `Next overlap in: ${hoursToNext}h ${minutesToNext}m ${secondsToNext}s`;
+            document.getElementById('next-overlap-time').textContent = 
+                `At ${next.displayString}`;
+        }
+        
+        // Initialize clock numbers
+        function initializeClockNumbers() {
+            const numbersContainer = document.getElementById('clock-numbers');
+            
+            for (let i = 1; i <= 12; i++) {
+                const numberDiv = document.createElement('div');
+                numberDiv.className = 'number';
+                numberDiv.textContent = i;
+                
+                // Position numbers around the clock
+                const angle = (i * 30 - 90) * (Math.PI / 180); // Convert to radians, offset by -90°
+                const radius = 130; // Distance from center
+                const x = 150 + radius * Math.cos(angle);
+                const y = 150 + radius * Math.sin(angle);
+                
+                numberDiv.style.left = `${x - 15}px`; // Adjust for number size
+                numberDiv.style.top = `${y - 15}px`;
+                
+                numbersContainer.appendChild(numberDiv);
+            }
+        }
+        
+        // Main variables
+        let currentTimeInMinutes = 0;
+        let isRealTime = true;
+        let realTimeInterval;
+        
+        // Initialize
+        function init() {
+            displayOverlapList();
+            initializeClockNumbers();
+            
+            // Start with current real time
+            const now = new Date();
+            currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+            updateClock(currentTimeInMinutes);
+            updateOverlapStatus(currentTimeInMinutes);
+            
+            // Set up real-time updates
+            realTimeInterval = setInterval(() => {
+                if (isRealTime) {
+                    const now = new Date();
+                    currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+                    updateClock(currentTimeInMinutes);
+                    updateOverlapStatus(currentTimeInMinutes);
+                }
+            }, 1000);
+            
+            // Button event listeners
+            document.getElementById('prev-btn').addEventListener('click', () => {
+                isRealTime = false;
+                const overlaps = calculateOverlapTimes();
+                const { nearest } = findNearestOverlap(currentTimeInMinutes);
+                
+                let prevIndex = nearest.index - 2;
+                if (prevIndex < 0) prevIndex = overlaps.length - 1;
+                
+                currentTimeInMinutes = overlaps[prevIndex].totalMinutes;
+                updateClock(currentTimeInMinutes);
+                updateOverlapStatus(currentTimeInMinutes);
+            });
+            
+            document.getElementById('next-btn').addEventListener('click', () => {
+                isRealTime = false;
+                const overlaps = calculateOverlapTimes();
+                const { nearest } = findNearestOverlap(currentTimeInMinutes);
+                
+                let nextIndex = nearest.index % overlaps.length;
+                currentTimeInMinutes = overlaps[nextIndex].totalMinutes;
+                updateClock(currentTimeInMinutes);
+                updateOverlapStatus(currentTimeInMinutes);
+            });
+            
+            document.getElementById('real-time-btn').addEventListener('click', () => {
+                isRealTime = true;
+                const now = new Date();
+                currentTimeInMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+                updateClock(currentTimeInMinutes);
+                updateOverlapStatus(currentTimeInMinutes);
+            });
+            
+            // Click on overlap list items
+            document.getElementById('overlap-list').addEventListener('click', (e) => {
+                const item = e.target.closest('.overlap-item');
+                if (item) {
+                    const items = Array.from(document.getElementById('overlap-list').children);
+                    const index = items.indexOf(item);
+                    const overlaps = calculateOverlapTimes();
+                    
+                    isRealTime = false;
+                    currentTimeInMinutes = overlaps[index].totalMinutes;
+                    updateClock(currentTimeInMinutes);
+                    updateOverlapStatus(currentTimeInMinutes);
+                }
+            });
+        }
+        
+        // Start when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
