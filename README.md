@@ -1,6 +1,6 @@
 #### overlaps
-*overlap is*  
-<img src="https://latex.codecogs.com/svg.latex?\boxed{3927.27}" />  
+ 
+<img src="overlap.svg" />  
 
 # 🌀 Sacred Time Portals
 
