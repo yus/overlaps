@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>subaru · six‑point chronograph</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f8fafc;
+            color: #1e293b;
+            font-family: 'Courier New', 'SF Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        header, footer {
+            text-align: center;
+            padding: 1rem 0;
+            color: #475569;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            border: none;
+        }
+
+        header {
+            border-bottom: 1px solid #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            border-top: 1px solid #cbd5e1;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .clock-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+
+        .clock-container {
+            text-align: center;
+            flex: 0 1 auto;
+        }
+
+        .clock-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #334155;
+            margin-bottom: 0.5rem;
+        }
+
+        canvas {
+            background: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: block;
+            width: 200px;
+            height: 200px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .subaru-canvas {
+            border: 2px solid #000000;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #ffffff;
+            border: 1px solid #1e293b;
+            color: #1e293b;
+            font-family: inherit;
+            font-size: 0.9rem;
+            padding: 0.6rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            letter-spacing: 0.5px;
+            min-width: 100px;
+        }
+
+        button:hover {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .word-panel {
+            font-size: 3.5rem;
+            font-weight: 400;
+            letter-spacing: 0.5rem;
+            text-align: center;
+            color: #0f172a;
+            margin: 1.5rem 0 0.5rem;
+            font-family: 'Courier New', monospace;
+            line-height: 1.2;
+            border: none;
+        }
+
+        .word-sub {
+            font-size: 0.8rem;
+            color: #475569;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .stats {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 2rem;
+            font-size: 0.8rem;
+            color: #334155;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #cbd5e1;
+            margin: 1rem 0;
+        }
+
+        .mode-switch {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: 1px solid #94a3b8;
+            color: #334155;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            min-width: auto;
+        }
+
+        .mode-btn.active {
+            background: #1e293b;
+            color: white;
+            border-color: #1e293b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <span>⚙️ SUBARU · SIX‑POINT CHRONOGRAPH ⚙️</span>
+        </header>
+
+        <div class="mode-switch">
+            <button class="mode-btn active" id="modeNormal">24h clock</button>
+            <button class="mode-btn" id="mode22h">22h clock</button>
+        </div>
+
+        <div class="clock-row">
+            <div class="clock-container">
+                <div class="clock-label">MAIN · time</div>
+                <canvas id="mainClock" width="200" height="200"></canvas>
+            </div>
+            <div class="clock-container">
+                <div class="clock-label">SUBARU · 0.336s</div>
+                <canvas id="subaruClock" width="200" height="200" class="subaru-canvas"></canvas>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="freezeBtn">⏸️ freeze</button>
+            <button id="resetBtn">⟲ reset</button>
+            <button id="stepBtn">⏵ step</button>
+        </div>
+
+        <div class="word-panel" id="currentWord">A A A A</div>
+        <div class="word-sub">four letters · one moment</div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div>subaru period</div>
+                <div class="stat-value">0.336 s</div>
+            </div>
+            <div class="stat-item">
+                <div>words / sec</div>
+                <div class="stat-value">178.57</div>
+            </div>
+            <div class="stat-item">
+                <div>fraction</div>
+                <div class="stat-value">29.(6)</div>
+            </div>
+        </div>
+
+        <footer>
+            <span>22 letters · stoppable · six‑point · dry</span>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            // ----- constants -----
+            const BASE_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUV'; // 22
+            const PERIODS = {
+                subaru: 0.336,        // fixed
+                second: 60,
+                minute: 22,            // double‑eleven (your minute)
+                hour: 3927.27
+            };
+
+            // state
+            let frozen = false;
+            let frozenTime = null;          // in seconds (reference)
+            let frozenAngles = null;
+            let mode = 'normal';             // 'normal' (24h) or '22h'
+
+            // DOM elements
+            const mainCanvas = document.getElementById('mainClock');
+            const subCanvas = document.getElementById('subaruClock');
+            const ctxMain = mainCanvas.getContext('2d');
+            const ctxSub = subCanvas.getContext('2d');
+            const wordDiv = document.getElementById('currentWord');
+            const freezeBtn = document.getElementById('freezeBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const stepBtn = document.getElementById('stepBtn');
+            const modeNormal = document.getElementById('modeNormal');
+            const mode22h = document.getElementById('mode22h');
+
+            // ----- helper: get letter index from angle (0-360) -----
+            function getLetterIndex(angleDeg) {
+                return Math.floor((angleDeg % 360) / 360 * 22) % 22;
+            }
+
+            // ----- compute angles at a given time (seconds) -----
+            function computeAngles(t) {
+                // main clock
+                let mainSecond, mainMinute, mainHour;
+
+                if (mode === 'normal') {
+                    // 24h mode: hour hand once per 12h, minute once per 1h, second once per 60s
+                    // but we want a consistent "time of day" – use t modulo 12h for hour hand
+                    const tMod = t % (12 * 3600);  // seconds in 12h cycle
+                    mainSecond = (t / 60) * 360 % 360;        // seconds hand, 60s per rot
+                    mainMinute = (tMod / 3600) * 360 % 360;    // minute hand, 1h per rot (3600s)
+                    mainHour = (tMod / (12 * 3600)) * 360 % 360; // hour hand, 12h per rot
+                } else {
+                    // 22h mode: your system
+                    mainSecond = (t / PERIODS.second) * 360 % 360;
+                    mainMinute = (t / PERIODS.minute) * 360 % 360;
+                    mainHour = (t / PERIODS.hour) * 360 % 360;
+                }
+
+                // subaru clock: only one hand, period 0.336s
+                let subaruAngle = (t / PERIODS.subaru) * 360 % 360;
+
+                return {
+                    main: { second: mainSecond, minute: mainMinute, hour: mainHour },
+                    subaru: subaruAngle
+                };
+            }
+
+            // ----- draw a clock (generic) -----
+            function drawClock(ctx, angles, isSubaru = false) {
+                const w = ctx.canvas.width;
+                const h = ctx.canvas.height;
+                const cx = w/2;
+                const cy = h/2;
+                const r = Math.min(w, h) * 0.4;
+
+                ctx.clearRect(0, 0, w, h);
+
+                // white background, black lines
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, w, h);
+
+                // outer circle
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                if (!isSubaru) {
+                    // main clock: 22 letter marks
+                    for (let i = 0; i < 22; i++) {
+                        let angle = (i / 22) * 2 * Math.PI - Math.PI/2;
+                        let x1 = cx + (r - 8) * Math.cos(angle);
+                        let y1 = cy + (r - 8) * Math.sin(angle);
+                        let x2 = cx + (r + 4) * Math.cos(angle);
+                        let y2 = cy + (r + 4) * Math.sin(angle);
+
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.strokeStyle = '#334155';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+
+                        // small letter
+                        let xText = cx + (r - 18) * Math.cos(angle);
+                        let yText = cy + (r - 18) * Math.sin(angle) + 4;
+                        ctx.font = '10px monospace';
+                        ctx.fillStyle = '#1e293b';
+                        ctx.fillText(BASE_LETTERS[i], xText - 5, yText);
+                    }
+
+                    // draw three hands
+                    const hands = [
+                        { angle: angles.hour, len: r * 0.5, width: 2 },   // hour
+                        { angle: angles.minute, len: r * 0.7, width: 1.5 }, // minute
+                        { angle: angles.second, len: r * 0.85, width: 1 }   // second
+                    ];
+                    hands.forEach(hand => {
+                        let rad = (hand.angle - 90) * Math.PI / 180;
+                        let x = cx + hand.len * Math.cos(rad);
+                        let y = cy + hand.len * Math.sin(rad);
+                        ctx.beginPath();
+                        ctx.moveTo(cx, cy);
+                        ctx.lineTo(x, y);
+                        ctx.strokeStyle = '#0f172a';
+                        ctx.lineWidth = hand.width;
+                        ctx.stroke();
+                    });
+                } else {
+                    // subaru clock: single hand, 22 marks, bold
+                    for (let i = 0; i < 22; i++) {
+                        let angle = (i / 22) * 2 * Math.PI - Math.PI/2;
+                        let x1 = cx + (r - 10) * Math.cos(angle);
+                        let y1 = cy + (r - 10) * Math.sin(angle);
+                        let x2 = cx + (r + 6) * Math.cos(angle);
+                        let y2 = cy + (r + 6) * Math.sin(angle);
+
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.strokeStyle = '#1e293b';
+                        ctx.lineWidth = 1.2;
+                        ctx.stroke();
+
+                        // show letter inside
+                        let xText = cx + (r - 22) * Math.cos(angle);
+                        let yText = cy + (r - 22) * Math.sin(angle) + 4;
+                        ctx.font = 'bold 11px monospace';
+                        ctx.fillStyle = '#0f172a';
+                        ctx.fillText(BASE_LETTERS[i], xText - 6, yText);
+                    }
+
+                    // single hand
+                    let rad = (angles - 90) * Math.PI / 180;
+                    let x = cx + r * 0.9 * Math.cos(rad);
+                    let y = cy + r * 0.9 * Math.sin(rad);
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(x, y);
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+                }
+
+                // center dot
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3, 0, 2 * Math.PI);
+                ctx.fillStyle = '#1e293b';
+                ctx.fill();
+            }
+
+            // ----- update display based on current time / frozen state -----
+            function updateDisplay() {
+                let t;
+                if (frozen && frozenAngles) {
+                    // use frozen angles directly
+                    drawClock(ctxMain, frozenAngles.main, false);
+                    drawClock(ctxSub, frozenAngles.subaru, true);
+
+                    // update word from frozen angles
+                    let hourIdx = getLetterIndex(frozenAngles.main.hour);
+                    let minuteIdx = getLetterIndex(frozenAngles.main.minute);
+                    let secondIdx = getLetterIndex(frozenAngles.main.second);
+                    let subIdx = getLetterIndex(frozenAngles.subaru);
+                    wordDiv.textContent = `${BASE_LETTERS[hourIdx]} ${BASE_LETTERS[minuteIdx]} ${BASE_LETTERS[secondIdx]} ${BASE_LETTERS[subIdx]}`;
+                    return;
+                }
+
+                t = frozen ? (frozenTime !== null ? frozenTime : 0) : (performance.now() / 1000);
+                let angles = computeAngles(t);
+                drawClock(ctxMain, angles.main, false);
+                drawClock(ctxSub, angles.subaru, true);
+
+                let hourIdx = getLetterIndex(angles.main.hour);
+                let minuteIdx = getLetterIndex(angles.main.minute);
+                let secondIdx = getLetterIndex(angles.main.second);
+                let subIdx = getLetterIndex(angles.subaru);
+                wordDiv.textContent = `${BASE_LETTERS[hourIdx]} ${BASE_LETTERS[minuteIdx]} ${BASE_LETTERS[secondIdx]} ${BASE_LETTERS[subIdx]}`;
+
+                if (!frozen) {
+                    frozenTime = t;  // keep track even when running
+                }
+            }
+
+            // ----- animation loop (only when not frozen) -----
+            function tick() {
+                if (!frozen) {
+                    updateDisplay();
+                }
+                requestAnimationFrame(tick);
+            }
+
+            // ----- event handlers -----
+            freezeBtn.addEventListener('click', () => {
+                if (!frozen) {
+                    // freeze now
+                    frozen = true;
+                    frozenTime = performance.now() / 1000;  // store current time
+                    frozenAngles = computeAngles(frozenTime);
+                    freezeBtn.textContent = '▶️ resume';
+                } else {
+                    // resume
+                    frozen = false;
+                    frozenAngles = null;
+                    freezeBtn.textContent = '⏸️ freeze';
+                }
+                updateDisplay();
+            });
+
+            resetBtn.addEventListener('click', () => {
+                frozen = true;
+                frozenTime = 0;
+                frozenAngles = computeAngles(0);
+                freezeBtn.textContent = '▶️ resume';
+                updateDisplay();
+            });
+
+            stepBtn.addEventListener('click', () => {
+                if (!frozen) {
+                    // if running, freeze first
+                    frozen = true;
+                    frozenTime = performance.now() / 1000;
+                    freezeBtn.textContent = '▶️ resume';
+                }
+                // advance by 0.336 seconds (one subaru rotation)
+                frozenTime += PERIODS.subaru;
+                frozenAngles = computeAngles(frozenTime);
+                updateDisplay();
+            });
+
+            modeNormal.addEventListener('click', () => {
+                mode = 'normal';
+                modeNormal.classList.add('active');
+                mode22h.classList.remove('active');
+                if (frozen && frozenTime !== null) {
+                    frozenAngles = computeAngles(frozenTime);
+                }
+                updateDisplay();
+            });
+
+            mode22h.addEventListener('click', () => {
+                mode = '22h';
+                mode22h.classList.add('active');
+                modeNormal.classList.remove('active');
+                if (frozen && frozenTime !== null) {
+                    frozenAngles = computeAngles(frozenTime);
+                }
+                updateDisplay();
+            });
+
+            // start
+            tick();
+            updateDisplay();
+
+            // handle window resize if needed (but canvas fixed size)
+        })();
+    </script>
+</body>
+</html>
