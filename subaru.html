@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>subaru • six‑star time</title>
+    <style>
+        body {
+            background: #0a0c14;
+            color: #dde3ed;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        h1 {
+            font-size: 1.8rem;
+            letter-spacing: 0.2rem;
+            color: #b7c9e2;
+            text-shadow: 0 0 8px #3c5a8c;
+        }
+        .subaru {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 0 12px #88aadd);
+            margin: 0.5rem 0 1rem;
+        }
+        canvas {
+            background: #111620;
+            border-radius: 50%;
+            box-shadow: 0 0 40px #2f4172;
+            display: block;
+            margin: 0 auto;
+            max-width: 90vw;
+            max-height: 90vw;
+        }
+        .word-panel {
+            margin: 2rem auto 1rem;
+            font-size: 4rem;
+            font-weight: bold;
+            letter-spacing: 1rem;
+            text-transform: uppercase;
+            background: #1e2533;
+            padding: 1rem 2rem;
+            border-radius: 4rem;
+            display: inline-block;
+            border: 2px solid #5d7bb3;
+            box-shadow: inset 0 0 20px #1f2b44, 0 0 30px #3f5f99;
+            color: #d7e4ff;
+        }
+        .state-note {
+            font-size: 1rem;
+            color: #9bb5de;
+            margin-top: 2rem;
+            font-style: italic;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            border-top: 1px dashed #4a618b;
+            padding-top: 1.5rem;
+        }
+        .state-note span {
+            color: #ffd966;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🍥 SUBARU · SIX‑STAR TIME</h1>
+    <div class="subaru">✨ ⭐ ⭐ ⭐ ⭐ ⭐ ✨</div>
+
+    <canvas id="clockCanvas" width="500" height="500"></canvas>
+
+    <div class="word-panel" id="currentWord">AAAA</div>
+
+    <div class="state-note">
+        <span>✦ STATE of Subaru Hand ✦</span><br>
+        spinning at 0.336 s · 178 words per second ·<br>
+        existence before reading · a system inside the system ·<br>
+        the hand that makes the clock real.
+    </div>
+
+    <script>
+        (function() {
+            const canvas = document.getElementById('clockCanvas');
+            const ctx = canvas.getContext('2d');
+            const wordDiv = document.getElementById('currentWord');
+
+            // Clock periods in seconds
+            const PERIODS = {
+                hour: 3927.27,      // your constant
+                minute: 22,          // double‑eleven
+                second: 60,           // normal minute
+                subaru: 0.336         // the fast one ✦
+            };
+
+            const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUV'; // 22 letters
+
+            function getLetterIndex(angleDeg) {
+                // angle 0–360 → 0–21
+                return Math.floor((angleDeg % 360) / 360 * 22) % 22;
+            }
+
+            function getHandAngles(nowSeconds) {
+                return {
+                    hour: (nowSeconds / PERIODS.hour) * 360 % 360,
+                    minute: (nowSeconds / PERIODS.minute) * 360 % 360,
+                    second: (nowSeconds / PERIODS.second) * 360 % 360,
+                    subaru: (nowSeconds / PERIODS.subaru) * 360 % 360
+                };
+            }
+
+            function drawClock(angles) {
+                const w = canvas.width;
+                const h = canvas.height;
+                const cx = w/2;
+                const cy = h/2;
+                const r = Math.min(w, h) * 0.4;
+
+                ctx.clearRect(0, 0, w, h);
+
+                // Dial background
+                ctx.beginPath();
+                ctx.arc(cx, cy, r + 8, 0, 2 * Math.PI);
+                ctx.fillStyle = '#1e2638';
+                ctx.fill();
+                ctx.strokeStyle = '#5f7bbf';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // 22 letter marks
+                for (let i = 0; i < 22; i++) {
+                    let angle = (i / 22) * 2 * Math.PI - Math.PI/2; // start at 12 o'clock
+                    let x1 = cx + (r - 15) * Math.cos(angle);
+                    let y1 = cy + (r - 15) * Math.sin(angle);
+                    let x2 = cx + (r + 5) * Math.cos(angle);
+                    let y2 = cy + (r + 5) * Math.sin(angle);
+
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.strokeStyle = '#8ba4dd';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                    // letter
+                    let xText = cx + (r - 30) * Math.cos(angle);
+                    let yText = cy + (r - 30) * Math.sin(angle) + 6;
+                    ctx.font = 'bold 14px monospace';
+                    ctx.fillStyle = '#c6d9ff';
+                    ctx.fillText(LETTERS[i], xText - 8, yText);
+                }
+
+                // Draw hands
+                const hands = [
+                    { angle: angles.hour, length: r * 0.5, width: 6, color: '#f0b3b3' }, // hour
+                    { angle: angles.minute, length: r * 0.7, width: 4, color: '#b3d0f0' }, // minute
+                    { angle: angles.second, length: r * 0.85, width: 2, color: '#f0e6b3' }, // second
+                    { angle: angles.subaru, length: r * 0.95, width: 1.5, color: '#d4b3f0' } // subaru ⭐
+                ];
+
+                hands.forEach(hand => {
+                    let rad = (hand.angle - 90) * Math.PI / 180; // -90 so 0° = 12 o'clock
+                    let x = cx + hand.length * Math.cos(rad);
+                    let y = cy + hand.length * Math.sin(rad);
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(x, y);
+                    ctx.strokeStyle = hand.color;
+                    ctx.lineWidth = hand.width;
+                    ctx.stroke();
+                });
+
+                // Center dot
+                ctx.beginPath();
+                ctx.arc(cx, cy, 10, 0, 2 * Math.PI);
+                ctx.fillStyle = '#f2e9c2';
+                ctx.shadowColor = '#aac0ff';
+                ctx.shadowBlur = 15;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            function updateWord(angles) {
+                let hourIdx = getLetterIndex(angles.hour);
+                let minuteIdx = getLetterIndex(angles.minute);
+                let secondIdx = getLetterIndex(angles.second);
+                let subaruIdx = getLetterIndex(angles.subaru);
+
+                let word = LETTERS[hourIdx] + LETTERS[minuteIdx] + LETTERS[secondIdx] + LETTERS[subaruIdx];
+                wordDiv.textContent = word;
+            }
+
+            function tick() {
+                let now = performance.now() / 1000; // seconds with sub‑ms precision
+                let angles = getHandAngles(now);
+                drawClock(angles);
+                updateWord(angles);
+                requestAnimationFrame(tick);
+            }
+
+            tick();
+        })();
+    </script>
+</body>
+</html>
