@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🍥 subaru trinity · yusdesign</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* ----- yusdesign core ----- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --border: #cbd5e1;
+            --accent: #334155;
+            --hover: #e2e8f0;
+            --shadow: rgba(0,0,0,0.05);
+            --subaru: #64748b;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f172a;
+                --text: #e2e8f0;
+                --border: #334155;
+                --accent: #94a3b8;
+                --hover: #1e293b;
+                --shadow: rgba(255,255,255,0.05);
+                --subaru: #8193b2;
+            }
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Courier New', 'SF Mono', 'IBM Plex Mono', monospace;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ----- compact header/footer ----- */
+        header, footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            margin-top: 1rem;
+            margin-bottom: 0;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        /* ----- knobs and controls (dry & boxed) ----- */
+        .control-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        button, .selector {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.75rem;
+            padding: 0.4rem 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.1s;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        button:hover, .selector:hover {
+            background: var(--hover);
+            border-color: var(--accent);
+        }
+
+        button.active {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .selector {
+            display: inline-block;
+            background: var(--bg);
+        }
+
+        /* ----- main grid: three panels ----- */
+        .trinity-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .panel {
+            border: 1px solid var(--border);
+            padding: 1rem;
+            background: var(--bg);
+        }
+
+        .panel-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--subaru);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.4rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* ----- clock canvases (compact) ----- */
+        .clock-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+        }
+
+        .clock-mini {
+            text-align: center;
+        }
+
+        .clock-mini canvas {
+            width: 120px;
+            height: 120px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            display: block;
+        }
+
+        .clock-label {
+            font-size: 0.6rem;
+            margin-top: 0.2rem;
+            color: var(--subaru);
+        }
+
+        /* ----- word displays (compact) ----- */
+        .word-row {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+            font-size: 2rem;
+            letter-spacing: 0.5rem;
+            font-weight: normal;
+            border: 1px solid var(--border);
+            padding: 1rem 0.5rem;
+        }
+
+        .word-cell {
+            text-align: center;
+            min-width: 3rem;
+        }
+
+        .word-sub {
+            font-size: 0.6rem;
+            color: var(--subaru);
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            border-top: 1px solid var(--border);
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+        }
+
+        /* ----- hebrew/greek/english tables (compact) ----- */
+        .letter-table {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.2rem;
+            margin-top: 0.8rem;
+            font-size: 0.7rem;
+        }
+
+        .letter-item {
+            text-align: center;
+            padding: 0.2rem;
+            border: 1px solid var(--border);
+        }
+
+        .hebrew { font-family: 'Times New Roman', serif; }
+        .greek { font-family: 'Times New Roman', serif; }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 0.8rem 0;
+        }
+
+        /* ----- responsive ----- */
+        @media (max-width: 800px) {
+            .trinity-grid {
+                grid-template-columns: 1fr;
+            }
+            .word-row {
+                font-size: 1.5rem;
+                flex-wrap: wrap;
+            }
+        }
+
+        /* subaru special */
+        .subaru-note {
+            font-size: 0.65rem;
+            color: var(--subaru);
+            text-align: center;
+            margin: 0.5rem 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- header: compact & democratic -->
+        <header>
+            <div class="header-left">
+                <span>🍥 yusdesign</span>
+                <span>v.24.22</span>
+            </div>
+            <div class="header-right">
+                <span class="selector" id="darkmodeToggle">☾ dark</span>
+                <span class="selector" id="langToggle">he/gk/en</span>
+            </div>
+        </header>
+
+        <!-- main control knobs (dry & boxed) -->
+        <div class="control-panel">
+            <button id="freezeBtn" class="active">⏸ freeze</button>
+            <button id="stepBtn">⏵ step</button>
+            <button id="resetBtn">⟲ reset</button>
+            <span class="selector" id="alphabetSelector">aleph‑bet</span>
+            <span class="selector" id="viewSelector">trinity</span>
+        </div>
+
+        <!-- trinity grid: three pages unified -->
+        <div class="trinity-grid">
+            <!-- PANEL 1: SACRED PORTALS (index.html) -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>🌀 sacred portals</span>
+                    <span>22 hebrew</span>
+                </div>
+                <!-- divine clock -->
+                <div style="text-align: center; margin-bottom: 0.8rem;">
+                    <span style="font-size: 1.8rem; font-weight: bold;" id="divineTime">01:05:27</span>
+                    <div style="font-size: 0.6rem;">next portal in</div>
+                </div>
+                <!-- mini portal ring (hebrew letters) -->
+                <div class="clock-grid">
+                    <div class="clock-mini">
+                        <canvas id="portalCanvas" width="120" height="120"></canvas>
+                        <div class="clock-label">portal ring</div>
+                    </div>
+                    <div style="flex:1; min-width: 120px;">
+                        <div class="letter-table" id="hebrewTable">
+                            <!-- filled by js -->
+                        </div>
+                    </div>
+                </div>
+                <!-- current portal -->
+                <div style="display: flex; justify-content: space-between; margin-top: 0.8rem; font-size: 0.8rem;">
+                    <span id="currentPortalHeb">ג</span>
+                    <span id="currentPortalName">Gimel</span>
+                    <span id="currentPortalTime">2:10:54</span>
+                </div>
+                <div class="subaru-note">12/11 hours = 3927.27s</div>
+            </div>
+
+            <!-- PANEL 2: SUBARU SIX‑STAR (subaru.html) -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>✨ six‑star subaru</span>
+                    <span>0.336s hand</span>
+                </div>
+                <!-- subaru clock (fast hand) -->
+                <div class="clock-grid">
+                    <div class="clock-mini">
+                        <canvas id="subaruCanvas" width="120" height="120"></canvas>
+                        <div class="clock-label">subaru ∞</div>
+                    </div>
+                    <div style="flex:1; text-align: center;">
+                        <div style="font-size: 2.5rem; letter-spacing: 0.3rem;" id="subaruWord">ACAJ</div>
+                        <div style="font-size: 0.6rem;">four letters · one moment</div>
+                    </div>
+                </div>
+                <!-- state note -->
+                <div class="subaru-note" style="margin: 0.5rem 0;">
+                    ✦ STATE of Subaru Hand ✦ spinning at 0.336s · 178 words/s
+                </div>
+                <!-- stats -->
+                <div class="stats-row">
+                    <span>period: 0.336s</span>
+                    <span>words/s: 178.57</span>
+                    <span>29.(6)</span>
+                </div>
+            </div>
+
+            <!-- PANEL 3: GREEK + HEBREW + ENGLISH (compact) -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>📜 trilingual</span>
+                    <span>α‑ω / א‑ת / a‑z</span>
+                </div>
+                <!-- greek 24 (α‑ω) -->
+                <div style="margin-bottom: 0.8rem;">
+                    <div style="font-size: 0.7rem; margin-bottom: 0.2rem;">greek · 24</div>
+                    <div class="letter-table" id="greekTable"></div>
+                </div>
+                <!-- hebrew 22 (א‑ת) -->
+                <div style="margin-bottom: 0.8rem;">
+                    <div style="font-size: 0.7rem; margin-bottom: 0.2rem;">hebrew · 22</div>
+                    <div class="letter-table" id="hebrewFullTable"></div>
+                </div>
+                <!-- english 26 (a‑z) but we show 22 for consistency -->
+                <div>
+                    <div style="font-size: 0.7rem; margin-bottom: 0.2rem;">english · 22</div>
+                    <div class="letter-table" id="englishTable"></div>
+                </div>
+                <!-- current letter description (single letter focus) -->
+                <hr>
+                <div style="display: flex; gap: 1rem; justify-content: center; font-size: 0.8rem;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem;" id="singleLetterHeb">א</div>
+                        <div>hebrew</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem;" id="singleLetterGk">Α</div>
+                        <div>greek</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem;" id="singleLetterEn">A</div>
+                        <div>english</div>
+                    </div>
+                </div>
+                <div class="subaru-note" id="letterMeaning">Aleph — ox, beginning</div>
+            </div>
+        </div>
+
+        <!-- footer: compact, with subaru meaning inclusion -->
+        <footer>
+            <span>🍥 twenty‑two pet</span>
+            <span>3927.27s heartbeat</span>
+            <span>⚙️ subaru: existence before reading</span>
+            <span>✦ freeze to read</span>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            // ----- yusdesign core -----
+            const PERIODS = {
+                portal: 3927.27,      // 1h5m27.27s
+                subaru: 0.336
+            };
+
+            // alphabets
+            const HEBREW = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ','ס','ע','פ','צ','ק','ר','ש','ת'];
+            const GREEK = ['Α','Β','Γ','Δ','Ε','Ζ','Η','Θ','Ι','Κ','Λ','Μ','Ν','Ξ','Ο','Π','Ρ','Σ','Τ','Υ','Φ','Χ','Ψ','Ω'];
+            const ENGLISH = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V']; // 22
+
+            const HEBREW_NAMES = [
+                'Aleph','Bet','Gimel','Dalet','He','Vav','Zayin','Chet','Tet','Yod','Kaf',
+                'Lamed','Mem','Nun','Samekh','Ayin','Pe','Tsadi','Qof','Resh','Shin','Tav'
+            ];
+
+            const GREEK_NAMES = [
+                'Alpha','Beta','Gamma','Delta','Epsilon','Zeta','Eta','Theta','Iota','Kappa','Lambda',
+                'Mu','Nu','Xi','Omicron','Pi','Rho','Sigma','Tau','Upsilon','Phi','Chi','Psi','Omega'
+            ];
+
+            // state
+            let frozen = false;
+            let frozenTime = 0;
+            let darkMode = false;
+            let lang = 'he'; // he/gk/en
+
+            // DOM elements
+            const divineTimeSpan = document.getElementById('divineTime');
+            const portalCanvas = document.getElementById('portalCanvas');
+            const subaruCanvas = document.getElementById('subaruCanvas');
+            const subaruWordSpan = document.getElementById('subaruWord');
+            const currentPortalHeb = document.getElementById('currentPortalHeb');
+            const currentPortalName = document.getElementById('currentPortalName');
+            const currentPortalTime = document.getElementById('currentPortalTime');
+            const singleLetterHeb = document.getElementById('singleLetterHeb');
+            const singleLetterGk = document.getElementById('singleLetterGk');
+            const singleLetterEn = document.getElementById('singleLetterEn');
+            const letterMeaning = document.getElementById('letterMeaning');
+
+            // buttons
+            const freezeBtn = document.getElementById('freezeBtn');
+            const stepBtn = document.getElementById('stepBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const darkmodeToggle = document.getElementById('darkmodeToggle');
+            const langToggle = document.getElementById('langToggle');
+
+            // fill tables
+            function fillTables() {
+                // hebrew table (first 12 for compactness)
+                let hebrewHtml = '';
+                for (let i = 0; i < 12; i++) {
+                    hebrewHtml += `<div class="letter-item hebrew">${HEBREW[i]}</div>`;
+                }
+                document.getElementById('hebrewTable').innerHTML = hebrewHtml;
+
+                // greek table (24)
+                let greekHtml = '';
+                GREEK.forEach((g, i) => {
+                    greekHtml += `<div class="letter-item greek">${g}</div>`;
+                });
+                document.getElementById('greekTable').innerHTML = greekHtml;
+
+                // hebrew full
+                let hebFullHtml = '';
+                HEBREW.forEach(h => {
+                    hebFullHtml += `<div class="letter-item hebrew">${h}</div>`;
+                });
+                document.getElementById('hebrewFullTable').innerHTML = hebFullHtml;
+
+                // english 22
+                let engHtml = '';
+                ENGLISH.forEach(e => {
+                    engHtml += `<div class="letter-item">${e}</div>`;
+                });
+                document.getElementById('englishTable').innerHTML = engHtml;
+            }
+
+            // get letter index from angle
+            function getIndex(angleDeg, count) {
+                return Math.floor((angleDeg % 360) / 360 * count) % count;
+            }
+
+            // update displays
+            function update(t) {
+                if (!frozen) t = performance.now() / 1000;
+
+                // divine clock (portal time)
+                const portalPeriod = PERIODS.portal;
+                const tMod = t % portalPeriod;
+                const totalSec = tMod;
+                const hours = Math.floor(totalSec / 3600);
+                const minutes = Math.floor((totalSec % 3600) / 60);
+                const secs = Math.floor(totalSec % 60);
+                divineTimeSpan.textContent = `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+
+                // portal ring angle (for hebrew letter)
+                const portalAngle = (t / portalPeriod) * 360;
+                const hebrewIdx = getIndex(portalAngle, 22);
+                currentPortalHeb.textContent = HEBREW[hebrewIdx];
+                currentPortalName.textContent = HEBREW_NAMES[hebrewIdx];
+
+                // portal time (next portal)
+                const nextPortalSec = (portalPeriod - (t % portalPeriod)) % portalPeriod;
+                const nextH = Math.floor(nextPortalSec / 3600);
+                const nextM = Math.floor((nextPortalSec % 3600) / 60);
+                currentPortalTime.textContent = `${nextH.toString().padStart(2,'0')}:${nextM.toString().padStart(2,'0')}`;
+
+                // subaru word (4 letters: from subaru, second, minute, hour? we'll use subaru only for demo)
+                const subaruAngle = (t / PERIODS.subaru) * 360;
+                const subIdx = getIndex(subaruAngle, 22);
+                // for simplicity, we use same letter repeated? no, we use four different: subaru, hebrew, greek, english indices based on same time
+                const gkIdx = getIndex(portalAngle, 24); // greek 24
+                const enIdx = getIndex(portalAngle, 22); // english 22
+                subaruWordSpan.textContent = HEBREW[subIdx] + GREEK[gkIdx] + ENGLISH[enIdx] + HEBREW[(subIdx+11)%22];
+
+                // single letter descriptions
+                singleLetterHeb.textContent = HEBREW[hebrewIdx];
+                singleLetterGk.textContent = GREEK[gkIdx];
+                singleLetterEn.textContent = ENGLISH[enIdx];
+                letterMeaning.textContent = `${HEBREW_NAMES[hebrewIdx]} — ${GREEK_NAMES[gkIdx]} — ${ENGLISH[enIdx]}`;
+
+                // draw simple clocks (we'll just draw circles with hands)
+                drawPortalClock(portalAngle);
+                drawSubaruClock(subaruAngle);
+            }
+
+            function drawPortalClock(angle) {
+                const ctx = portalCanvas.getContext('2d');
+                const w = 120, h = 120, cx = 60, cy = 60, r = 50;
+                ctx.clearRect(0,0,w,h);
+                ctx.strokeStyle = darkMode ? '#94a3b8' : '#1e293b';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(cx,cy,r,0,2*Math.PI);
+                ctx.stroke();
+                // hand
+                let rad = (angle - 90) * Math.PI/180;
+                let x = cx + r*0.7 * Math.cos(rad);
+                let y = cy + r*0.7 * Math.sin(rad);
+                ctx.beginPath();
+                ctx.moveTo(cx,cy);
+                ctx.lineTo(x,y);
+                ctx.stroke();
+            }
+
+            function drawSubaruClock(angle) {
+                const ctx = subaruCanvas.getContext('2d');
+                const w = 120, h = 120, cx = 60, cy = 60, r = 50;
+                ctx.clearRect(0,0,w,h);
+                ctx.strokeStyle = darkMode ? '#8193b2' : '#334155';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(cx,cy,r,0,2*Math.PI);
+                ctx.stroke();
+                let rad = (angle - 90) * Math.PI/180;
+                let x = cx + r*0.9 * Math.cos(rad);
+                let y = cy + r*0.9 * Math.sin(rad);
+                ctx.beginPath();
+                ctx.moveTo(cx,cy);
+                ctx.lineTo(x,y);
+                ctx.strokeStyle = darkMode ? '#e2e8f0' : '#0f172a';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            // event handlers
+            freezeBtn.addEventListener('click', () => {
+                frozen = !frozen;
+                if (frozen) {
+                    frozenTime = performance.now() / 1000;
+                    freezeBtn.textContent = '▶ resume';
+                } else {
+                    freezeBtn.textContent = '⏸ freeze';
+                }
+                update(frozen ? frozenTime : performance.now()/1000);
+            });
+
+            stepBtn.addEventListener('click', () => {
+                if (!frozen) {
+                    frozen = true;
+                    frozenTime = performance.now() / 1000;
+                    freezeBtn.textContent = '▶ resume';
+                }
+                frozenTime += PERIODS.subaru;
+                update(frozenTime);
+            });
+
+            resetBtn.addEventListener('click', () => {
+                frozen = true;
+                frozenTime = 0;
+                freezeBtn.textContent = '▶ resume';
+                update(0);
+            });
+
+            darkmodeToggle.addEventListener('click', () => {
+                darkMode = !darkMode;
+                darkmodeToggle.textContent = darkMode ? '☀ light' : '☾ dark';
+                document.documentElement.style.setProperty('--bg', darkMode ? '#0f172a' : '#f8fafc');
+                document.documentElement.style.setProperty('--text', darkMode ? '#e2e8f0' : '#1e293b');
+                document.documentElement.style.setProperty('--border', darkMode ? '#334155' : '#cbd5e1');
+                update(frozen ? frozenTime : performance.now()/1000);
+            });
+
+            langToggle.addEventListener('click', () => {
+                if (lang === 'he') lang = 'gk';
+                else if (lang === 'gk') lang = 'en';
+                else lang = 'he';
+                langToggle.textContent = lang === 'he' ? 'he/gk/en' : (lang === 'gk' ? 'gk/en/he' : 'en/he/gk');
+                // could update labels, but we keep static for now
+            });
+
+            // init
+            fillTables();
+            setInterval(() => {
+                if (!frozen) {
+                    update(performance.now() / 1000);
+                }
+            }, 100);
+        })();
+    </script>
+</body>
+</html>
