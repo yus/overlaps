@@ -2,7 +2,8 @@
  
 <img src="overlap.svg" />  
 
-[subaru](https://yus.github.io/overlaps/subaru.html): Subaru Hand of Chronos ⚡  
+[SUBARU](https://yus.github.io/overlaps/subaru.html):  
+Subaru Hand of Chronos ⚡  
 
 # 🌀 Sacred Time Portals
 
