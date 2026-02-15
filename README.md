@@ -2,6 +2,8 @@
  
 <img src="overlap.svg" />  
 
+[subaru](https://yus.github.io/overlaps/subaru.html): Subaru Hand of Chronos ⚡  
+
 # 🌀 Sacred Time Portals
 
 *22 Moments When Clock Hands Unite in Divine Harmony*
