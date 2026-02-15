@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🍥 subaru · one watch</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <style>
+        /* ----- yusdesign core: desktop-for-mobile ----- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --border: #cbd5e1;
+            --accent: #334155;
+            --hover: #e2e8f0;
+            --subaru: #64748b;
+            --radius: 0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f172a;
+                --text: #e2e8f0;
+                --border: #334155;
+                --accent: #94a3b8;
+                --hover: #1e293b;
+                --subaru: #8193b2;
+            }
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Courier New', 'SF Mono', 'IBM Plex Mono', monospace;
+            line-height: 1.4;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;  /* comfortable mobile width, also fine on desktop */
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* ----- compact header (3a) ----- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-left {
+            display: flex;
+            gap: 16px;
+        }
+
+        .dark-toggle {
+            cursor: pointer;
+            user-select: none;
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+        }
+
+        .dark-toggle:hover {
+            background: var(--hover);
+        }
+
+        /* ----- main watch component (1a + 1b) ----- */
+        .watch-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        canvas#mainWatch {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: var(--bg);
+        }
+
+        /* ----- knobs section (3c) compact row ----- */
+        .knobs {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 8px 0;
+        }
+
+        .knob-group {
+            display: flex;
+            gap: 4px;
+            border: 1px solid var(--border);
+            padding: 4px;
+        }
+
+        button, .mode-indicator {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+            padding: 8px 16px;
+            cursor: pointer;
+            min-width: 70px;
+            text-align: center;
+            transition: all 0.1s;
+        }
+
+        button:hover {
+            background: var(--hover);
+        }
+
+        button.active {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .mode-indicator {
+            background: var(--accent);
+            color: var(--bg);
+            cursor: default;
+        }
+
+        /* ----- description area (3d) ----- */
+        .description {
+            border: 1px solid var(--border);
+            padding: 16px 12px;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .glyph-row {
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            gap: 20px;
+            margin-bottom: 8px;
+        }
+
+        .glyph-heb {
+            font-size: 48px;
+            line-height: 1;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .glyph-gk {
+            font-size: 48px;
+            line-height: 1;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .glyph-en {
+            font-size: 24px;
+            line-height: 1;
+            align-self: center;
+            color: var(--subaru);
+        }
+
+        .meaning {
+            font-size: 16px;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .sub-note {
+            font-size: 12px;
+            color: var(--subaru);
+            margin-top: 8px;
+            font-style: italic;
+            border-top: 1px dashed var(--border);
+            padding-top: 8px;
+        }
+
+        /* ----- hypercompact footer (4) ----- */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--subaru);
+        }
+
+        /* helper */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- header: dark/light switch (3a) -->
+        <div class="header">
+            <div class="header-left">
+                <span>🍥 yus</span>
+                <span>subaru</span>
+            </div>
+            <div class="dark-toggle" id="darkToggle">☾ dark</div>
+        </div>
+
+        <!-- main watch component (1a+1b) -->
+        <div class="watch-container">
+            <canvas id="mainWatch" width="500" height="500"></canvas>
+        </div>
+
+        <!-- knobs section (3c) -->
+        <div class="knobs">
+            <div class="knob-group">
+                <button id="modeHeb" class="active">עברית</button>
+                <button id="modeGk">Ελληνικά</button>
+            </div>
+            <div class="knob-group">
+                <button id="playBtn" class="active">▶ play</button>
+                <button id="stopBtn">⏸ stop</button>
+            </div>
+        </div>
+
+        <!-- description area (3d) -->
+        <div class="description" id="description">
+            <div class="glyph-row">
+                <span class="glyph-heb" id="hebGlyph">א</span>
+                <span class="glyph-gk" id="gkGlyph">Α</span>
+                <span class="glyph-en" id="enGlyph">A</span>
+            </div>
+            <div class="meaning" id="meaning">Aleph · Alpha · ox, beginning</div>
+            <div class="sub-note" id="subNote">
+                <span id="subaruWord">Α Α Α</span> · 178 words/s · subaru hand
+            </div>
+        </div>
+
+        <!-- hypercompact footer (4) -->
+        <div class="footer">
+            <span>22·24</span>
+            <span>3927.27s</span>
+            <span>0.336s</span>
+            <span>✦ freeze to read</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ----- constants -----
+            const HEBREW = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ','ס','ע','פ','צ','ק','ר','ש','ת'];
+            const GREEK = ['Α','Β','Γ','Δ','Ε','Ζ','Η','Θ','Ι','Κ','Λ','Μ','Ν','Ξ','Ο','Π','Ρ','Σ','Τ','Υ','Φ','Χ','Ψ','Ω'];
+            const ENGLISH = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+            
+            const HEB_MEANINGS = [
+                'ox, leader', 'house', 'camel, lift', 'door', 'window, behold', 'hook, connect',
+                'weapon, crown', 'fence, life', 'snake, wheel', 'hand, deed', 'palm, open hand',
+                'staff, learn', 'water, chaos', 'fish, offspring', 'support, thorn', 'eye, watch',
+                'mouth, speak', 'fishhook, righteous', 'back of head, holy', 'head, beginning',
+                'tooth, sharp', 'cross, truth'
+            ];
+            
+            const GK_MEANINGS = [
+                'beginning', 'beta, second', 'earth, knowledge', 'door, fourth', 'simple being',
+                'life, zeal', 'seventh, breath', 'god, eighth', 'tenth, smallest', 'bend, hand',
+                'eleventh, staff', 'twelfth, water', 'thirteenth, fish', 'fourteenth, distinction',
+                'fifteenth, small', 'sixteenth, breadth', 'seventeenth, flow', 'eighteenth, hiss',
+                'nineteenth, mark', 'twentieth, lyre', 'twenty-first, ph', 'twenty-second, kh',
+                'twenty-third, ps', 'twenty-fourth, omega'
+            ];
+
+            const PERIODS = {
+                hour24: 12 * 3600,      // 12h for hour hand in 24h mode
+                hour22: 3927.27 * 22,   // 22 * your hour = full 22h day? actually hour hand in 22h mode: one rotation per 22 hours
+                minute: 3600,            // 1h for minute hand (in both modes, but scaled)
+                second: 60,              // normal seconds hand
+                subaru: 0.336
+            };
+
+            // state
+            let mode = 'heb';            // 'heb' or 'gk' — affects letters shown
+            let running = true;
+            let frozenTime = null;
+            let dark = false;
+
+            // DOM
+            const canvas = document.getElementById('mainWatch');
+            const ctx = canvas.getContext('2d');
+            const hebGlyph = document.getElementById('hebGlyph');
+            const gkGlyph = document.getElementById('gkGlyph');
+            const enGlyph = document.getElementById('enGlyph');
+            const meaning = document.getElementById('meaning');
+            const subaruWordSpan = document.getElementById('subaruWord');
+            const darkToggle = document.getElementById('darkToggle');
+            const modeHeb = document.getElementById('modeHeb');
+            const modeGk = document.getElementById('modeGk');
+            const playBtn = document.getElementById('playBtn');
+            const stopBtn = document.getElementById('stopBtn');
+
+            // helpers
+            function getAngle(period, t) {
+                return ((t % period) / period) * 360;
+            }
+
+            function getLetterIndex(angleDeg, count) {
+                return Math.floor((angleDeg % 360) / 360 * count) % count;
+            }
+
+            // drawing
+            function drawWatch(t) {
+                const w = canvas.width, h = canvas.height;
+                const cx = w/2, cy = h/2;
+                const R = Math.min(w, h) * 0.4;      // outer circle radius
+                const r = R * 0.5;                    // inner subaru circle radius (smaller than base radius)
+                const subaruCenterX = cx;
+                const subaruCenterY = cy + R * 0.6;   // under center of base circle (1b)
+
+                ctx.clearRect(0, 0, w, h);
+                ctx.strokeStyle = dark ? '#94a3b8' : '#1e293b';
+                ctx.lineWidth = 1.5;
+                ctx.fillStyle = dark ? '#0f172a' : '#f8fafc';
+                ctx.fillRect(0,0,w,h);
+
+                // ----- base circle (24/22 watch) -----
+                ctx.beginPath();
+                ctx.arc(cx, cy, R, 0, 2*Math.PI);
+                ctx.stroke();
+
+                // hour markers (24 or 22 depending on mode, but visually we show 24 for clarity)
+                for (let i = 0; i < 24; i++) {
+                    let angle = (i / 24) * 2 * Math.PI - Math.PI/2;
+                    let x1 = cx + (R - 10) * Math.cos(angle);
+                    let y1 = cy + (R - 10) * Math.sin(angle);
+                    let x2 = cx + (R + 5) * Math.cos(angle);
+                    let y2 = cy + (R + 5) * Math.sin(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.strokeStyle = dark ? '#8193b2' : '#334155';
+                    ctx.stroke();
+
+                    // small numbers/letters (optional)
+                }
+
+                // hands for base circle (real time, switchable scale)
+                const hourPeriod = mode === 'heb' ? PERIODS.hour22 : PERIODS.hour24;  // 22h mode vs 24h mode
+                const minutePeriod = PERIODS.minute;
+                const secondPeriod = PERIODS.second;
+
+                let hourAngle = getAngle(hourPeriod, t) - 90;  // -90 so 0° = 12 o'clock
+                let minuteAngle = getAngle(minutePeriod, t) - 90;
+                let secondAngle = getAngle(secondPeriod, t) - 90;
+
+                // draw hour hand
+                let hx = cx + R * 0.5 * Math.cos(hourAngle * Math.PI/180);
+                let hy = cy + R * 0.5 * Math.sin(hourAngle * Math.PI/180);
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(hx, hy);
+                ctx.strokeStyle = dark ? '#e2e8f0' : '#0f172a';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // minute hand
+                let mx = cx + R * 0.7 * Math.cos(minuteAngle * Math.PI/180);
+                let my = cy + R * 0.7 * Math.sin(minuteAngle * Math.PI/180);
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(mx, my);
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // seconds hand
+                let sx = cx + R * 0.85 * Math.cos(secondAngle * Math.PI/180);
+                let sy = cy + R * 0.85 * Math.sin(secondAngle * Math.PI/180);
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(sx, sy);
+                ctx.strokeStyle = dark ? '#94a3b8' : '#475569';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // ----- subaru inner circle (1b) -----
+                ctx.beginPath();
+                ctx.arc(subaruCenterX, subaruCenterY, r, 0, 2*Math.PI);
+                ctx.strokeStyle = dark ? '#8193b2' : '#334155';
+                ctx.stroke();
+
+                // subaru hand (seconds hand same as base, plus its own fast hand)
+                let subaruAngle = getAngle(PERIODS.subaru, t) - 90;
+                // draw subaru fast hand
+                let subx = subaruCenterX + r * 0.8 * Math.cos(subaruAngle * Math.PI/180);
+                let suby = subaruCenterY + r * 0.8 * Math.sin(subaruAngle * Math.PI/180);
+                ctx.beginPath();
+                ctx.moveTo(subaruCenterX, subaruCenterY);
+                ctx.lineTo(subx, suby);
+                ctx.strokeStyle = dark ? '#e2e8f0' : '#0f172a';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // also draw the same seconds hand as base (for reference)
+                let subSecX = subaruCenterX + r * 0.7 * Math.cos(secondAngle * Math.PI/180);
+                let subSecY = subaruCenterY + r * 0.7 * Math.sin(secondAngle * Math.PI/180);
+                ctx.beginPath();
+                ctx.moveTo(subaruCenterX, subaruCenterY);
+                ctx.lineTo(subSecX, subSecY);
+                ctx.strokeStyle = dark ? '#94a3b8' : '#64748b';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // small center dot
+                ctx.beginPath();
+                ctx.arc(subaruCenterX, subaruCenterY, 3, 0, 2*Math.PI);
+                ctx.fillStyle = dark ? '#e2e8f0' : '#0f172a';
+                ctx.fill();
+
+                // update description based on current letter
+                let currentHebIdx = getLetterIndex(hourAngle + 90, 22); // hour hand points to hebrew letter in 22h mode
+                let currentGkIdx = getLetterIndex(hourAngle + 90, 24);
+                let currentEnIdx = getLetterIndex(hourAngle + 90, 26);
+
+                hebGlyph.textContent = HEBREW[currentHebIdx];
+                gkGlyph.textContent = GREEK[currentGkIdx];
+                enGlyph.textContent = ENGLISH[currentEnIdx];
+
+                if (mode === 'heb') {
+                    meaning.textContent = `${HEBREW[currentHebIdx]} · ${HEB_MEANINGS[currentHebIdx]}`;
+                } else {
+                    meaning.textContent = `${GREEK[currentGkIdx]} · ${GK_MEANINGS[currentGkIdx]}`;
+                }
+
+                // subaru word: four letters from subaru hand (fast changing)
+                let subIdx = getLetterIndex(subaruAngle + 90, 22);
+                let subGkIdx = getLetterIndex(subaruAngle + 90, 24);
+                let subEnIdx = getLetterIndex(subaruAngle + 90, 26);
+                subaruWordSpan.innerHTML = `${HEBREW[subIdx]} ${GREEK[subGkIdx]} ${ENGLISH[subEnIdx]} ${HEBREW[(subIdx+11)%22]}`;
+            }
+
+            // animation loop
+            function tick() {
+                let t;
+                if (!running && frozenTime !== null) {
+                    t = frozenTime;
+                } else {
+                    t = performance.now() / 1000;
+                }
+                drawWatch(t);
+                requestAnimationFrame(tick);
+            }
+
+            // event listeners
+            darkToggle.addEventListener('click', () => {
+                dark = !dark;
+                darkToggle.textContent = dark ? '☀ light' : '☾ dark';
+                document.documentElement.style.setProperty('--bg', dark ? '#0f172a' : '#f8fafc');
+                document.documentElement.style.setProperty('--text', dark ? '#e2e8f0' : '#1e293b');
+                document.documentElement.style.setProperty('--border', dark ? '#334155' : '#cbd5e1');
+            });
+
+            modeHeb.addEventListener('click', () => {
+                mode = 'heb';
+                modeHeb.classList.add('active');
+                modeGk.classList.remove('active');
+            });
+
+            modeGk.addEventListener('click', () => {
+                mode = 'gk';
+                modeGk.classList.add('active');
+                modeHeb.classList.remove('active');
+            });
+
+            playBtn.addEventListener('click', () => {
+                running = true;
+                playBtn.classList.add('active');
+                stopBtn.classList.remove('active');
+            });
+
+            stopBtn.addEventListener('click', () => {
+                running = false;
+                frozenTime = performance.now() / 1000;
+                stopBtn.classList.add('active');
+                playBtn.classList.remove('active');
+            });
+
+            // start
+            tick();
+        })();
+    </script>
+</body>
+</html>
